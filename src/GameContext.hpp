@@ -1,6 +1,4 @@
-#ifndef GAMECONTEXT_HPP
-#define GAMECONTEXT_HPP
-
+#pragma once
 #include <cstdint>
 
 namespace SimpleSnake {
@@ -11,5 +9,3 @@ struct GameContext {
 };
 
 } // namespace SimpleSnake
-
-#endif
