@@ -1,7 +1,7 @@
-#ifndef GAME_HPP
-#define GAME_HPP
-
+#pragma once
 #include "GameContext.hpp"
+#include "Window.hpp"
+#include <memory>
 
 namespace SimpleSnake {
 
@@ -10,14 +10,13 @@ public:
   int run();
 
 private:
-  void startEventLoop();
+  bool initialize();
   void handleEvents();
   void update();
   void draw();
 
   GameContext context;
+  std::unique_ptr<Window> m_window;
 };
 
 } // namespace SimpleSnake
-
-#endif
