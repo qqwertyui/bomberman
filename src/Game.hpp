@@ -1,16 +1,23 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "GameContext.hpp"
+
+namespace SimpleSnake {
+
 class Game {
 public:
   int run();
 
 private:
+  void startEventLoop();
   void handleEvents();
   void update();
   void draw();
 
-  bool shouldExit{false};
+  GameContext context;
 };
+
+} // namespace SimpleSnake
 
 #endif
