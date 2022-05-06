@@ -1,27 +1,30 @@
 #include "Game.hpp"
+#include "ConfigLoader.hpp"
 #include "Event.hpp"
 #include "Timer.hpp"
+#include "utils/Log.hpp"
 #include <iostream>
 
 namespace SimpleSnake {
 
-static constexpr int FPS = 2;
+bool Game::initialize(int argc, char **argv) {
+  m_config = ConfigLoader::loadConfig(argc, argv);
+  LOG("Loaded configuration: %s", m_config.asString().c_str());
 
-bool Game::initialize() {
-  m_window = std::make_unique<Window>();
-  if (not m_window->isOk()) {
+  m_window = Window::create();
+  if (not m_window) {
     return false;
   }
   return true;
 }
 
-int Game::run() {
-  if (not initialize()) {
-    return false;
+int Game::run(int argc, char **argv) {
+  if (not initialize(argc, argv)) {
+    return 1;
   }
 
-  Timer timer{1.f / FPS * 1000};
-  while (not context.shouldExit) {
+  Timer timer{1.f / m_config.maxFps * 1000};
+  while (not m_context.shouldExit) {
     handleEvents();
     update();
     if (timer.nextTick()) {
@@ -29,7 +32,7 @@ int Game::run() {
       timer.reset();
     }
   }
-  return context.exitCode;
+  return m_context.exitCode;
 }
 
 void Game::handleEvents() {
@@ -37,14 +40,21 @@ void Game::handleEvents() {
   while (m_window->pollEvent(e)) {
     switch (e.type) {
     case Event::Type::KeyPressed: {
-      auto key{e.value.keyboard.code};
+      auto key{e.value.keyboard.key};
       if (key == Keyboard::Key::Escape) {
-        context.shouldExit = true;
+        m_context.shouldExit = true;
+      } else if (key == Keyboard::Key::A) {
+        std::cout << "A";
       }
       break;
     }
+    case Event::Type::MouseMoved: {
+      auto pos{e.value.mouse.pos};
+      std::cout << "Move is at (x=" << pos.x << ", y=" << pos.y << ")\n";
+      break;
+    }
     default: {
-      std::cout << "unhandled type, id = " << static_cast<int>(e.type) << "\n";
+      LOG("Unhandled event, id = %d", static_cast<int>(e.type));
     }
     }
   }
