@@ -1,8 +1,10 @@
 #pragma once
+#include <windows.h>
 
 namespace SimpleSnake {
 
-struct Keyboard {
+class Keyboard {
+public:
   enum class Key {
     Unknown = -1, //!< Unhandled key
     A = 0,        //!< The A key
@@ -109,6 +111,8 @@ struct Keyboard {
     F15,          //!< The F15 key
     Pause,        //!< The Pause key
   };
+
+  static Key mapVirtualKeyCodeToKey(WPARAM key, LPARAM flags);
 };
 
 } // namespace SimpleSnake

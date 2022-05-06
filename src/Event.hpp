@@ -1,21 +1,21 @@
 #pragma once
 
 #include "Keyboard.hpp"
+#include "utils/Vector2.hpp"
 
 namespace SimpleSnake {
 
 struct Event {
   enum class Type : int { None, KeyPressed, MouseMoved };
   struct KeyboardEvent {
-    Keyboard::Key code;
+    Keyboard::Key key;
   };
-  struct MouseEvent {
-    unsigned int x;
-    unsigned int y;
+  struct MouseMovedEvent {
+    Vector2u pos;
   };
   union Value {
     KeyboardEvent keyboard;
-    MouseEvent mouse;
+    MouseMovedEvent mouse;
   };
 
   Type type;
