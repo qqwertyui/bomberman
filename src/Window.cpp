@@ -9,14 +9,14 @@ std::unique_ptr<Window> Window::create() {
   auto window = std::unique_ptr<Window>(new Window);
   const std::string windowClassName{"SimpleSnake_WindowClass"};
   if (not registerWindowClass(windowClassName)) {
-    LOG("Failed to register window class\n");
+    LOG_ERR("Failed to register window class\n");
     return nullptr;
   }
   HWND hwnd = CreateWindow(windowClassName.c_str(), "Snake",
                            WS_OVERLAPPEDWINDOW, 200, 200, 200, 200, nullptr,
                            nullptr, GetModuleHandle(nullptr), window.get());
   if (not hwnd) {
-    LOG("Failed to create window\n");
+    LOG_ERR("Failed to create window\n");
     return nullptr;
   }
   ShowWindow(hwnd, SW_SHOW);

@@ -8,8 +8,9 @@
 namespace SimpleSnake {
 
 bool Game::initialize(int argc, char **argv) {
+  LOG_DBG("test");
   m_config = ConfigLoader::loadConfig(argc, argv);
-  LOG("Loaded configuration: %s", m_config.asString().c_str());
+  LOG_INF("Loaded configuration: [%s]", m_config->asString().c_str());
 
   m_window = Window::create();
   if (not m_window) {
@@ -20,11 +21,11 @@ bool Game::initialize(int argc, char **argv) {
 
 int Game::run(int argc, char **argv) {
   if (not initialize(argc, argv)) {
-    LOG("Initalization failed");
+    LOG_ERR("Initalization failed");
     return 1;
   }
 
-  Timer timer{1.f / m_config.maxFps() * 1000};
+  Timer timer{1.f / m_config->maxFps() * 1000};
   while (not m_context.shouldExit) {
     handleEvents();
     update();
@@ -55,7 +56,7 @@ void Game::handleEvents() {
       break;
     }
     default: {
-      LOG("Unhandled event, id = %d", static_cast<int>(e.type));
+      LOG_WRN("Unhandled event, id = %d", static_cast<int>(e.type));
     }
     }
   }

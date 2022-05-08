@@ -2,31 +2,43 @@
 #include "GlobalConfig.hpp"
 #include "utils/ArgumentParser.hpp"
 #include "utils/Log.hpp"
+#include <algorithm>
 
 namespace SimpleSnake {
-GlobalConfig ConfigLoader::loadConfig(int argc, char **argv) {
-  GlobalConfig config;
-  auto args = ArgumentParser::parse(argc, argv);
+std::unique_ptr<GlobalConfig> ConfigLoader::loadConfig(int argc, char **argv) {
+  auto config = std::make_unique<GlobalConfig>();
+  auto cmdLineArgs = ArgumentParser::parse(argc, argv);
 
-#ifdef ENABLE_LOGS
-  auto registeredParameters = GlobalConfig::getRegisteredParameters();
-  std::string allParamsString{};
-  for (const auto &param : registeredParameters) {
-    allParamsString += param + ",";
-  }
-  allParamsString.pop_back();
-  LOG("Registered configuration parameters: [%s]", allParamsString.c_str());
-#endif
-
-  for (const auto &[param, value] : args) {
-    if (param == "mapPath") {
-      config.mapPath() = value;
-    } else if (param == "maxFps") {
-      config.maxFps() = std::stoi(value);
-    } else {
-      LOG("Unrecognized argument: %s", param.c_str());
+  for (const auto &[param, value] : cmdLineArgs) {
+    if (not isParameterRegistered(param)) {
+      LOG_WRN("Unrecognized argument: %s", param.c_str());
+      continue;
     }
+    handleParameterSpecific(*config, param, value);
   }
   return config;
 }
+
+bool ConfigLoader::isParameterRegistered(const std::string &param) {
+  const auto &registeredParameters = GlobalConfig::getRegisteredParameters();
+  auto it =
+      std::find_if(registeredParameters.begin(), registeredParameters.end(),
+                   [&param](ParameterBase *parameter) {
+                     return (parameter->getName() == param);
+                   });
+  return (it != registeredParameters.end());
+}
+
+void ConfigLoader::handleParameterSpecific(GlobalConfig &config,
+                                           const std::string &param,
+                                           const std::string &value) {
+  if (param == "mapPath") {
+    config.mapPath() = value;
+  } else if (param == "maxFps") {
+    config.maxFps() = std::stoi(value);
+  } else {
+    LOG_WRN("Unhandled argument: %s", param.c_str());
+  }
+}
+
 } // namespace SimpleSnake

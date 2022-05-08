@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -15,12 +16,20 @@ template <> inline std::string toString(const std::string &value) {
   return value;
 }
 
+class ParameterBase {
+public:
+  virtual std::string asString() const = 0;
+  virtual std::string getName() const = 0;
+};
+
 #define PARAMETER(type, name, value)                                           \
-  class {                                                                      \
+  class class_##name : public ParameterBase {                                  \
   public:                                                                      \
+    class_##name() { GlobalConfig::parameters.push_back(this); }               \
     std::string asString() const {                                             \
       return #name + std::string("=") + toString(this->name);                  \
     }                                                                          \
+    std::string getName() const { return #name; }                              \
     type &operator()() { return this->name; }                                  \
                                                                                \
   private:                                                                     \
@@ -29,10 +38,9 @@ template <> inline std::string toString(const std::string &value) {
 
 /*
 Until some universal method is developed, every newly added parameter has to be
-added in GlobalConfig class manually by adding:
-- PARAMETER entry
-- updating asString method
-- updating getRegisteredParameters method
+added in GlobalConfig class manually by:
+- adding PARAMETER entry
+- updating handleParameterSpecific in ConfigLoader.cpp
 */
 class GlobalConfig {
 public:
@@ -41,18 +49,20 @@ public:
 
   std::string asString() {
     std::string result;
-    result += "[";
-    result += maxFps.asString() + ", ";
-    result += mapPath.asString();
-    result += "]";
+    for (auto &parameter : parameters) {
+      result += parameter->asString() + ",";
+    }
+    result.pop_back();
     return result;
   }
-  static std::vector<std::string> getRegisteredParameters() {
-    std::vector<std::string> registeredParams{};
-    registeredParams.push_back("maxFps");
-    registeredParams.push_back("maxPath");
-    return registeredParams;
+  static const std::vector<ParameterBase *> &getRegisteredParameters() {
+    return parameters;
   }
+
+private:
+  static std::vector<ParameterBase *> parameters;
 };
+
+inline std::vector<ParameterBase *> GlobalConfig::parameters{};
 
 } // namespace SimpleSnake
