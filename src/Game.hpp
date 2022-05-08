@@ -17,7 +17,7 @@ private:
   void draw();
 
   GameContext m_context;
-  GlobalConfig m_config;
+  std::unique_ptr<GlobalConfig> m_config;
   std::unique_ptr<Window> m_window;
 };
 
