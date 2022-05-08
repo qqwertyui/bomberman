@@ -20,10 +20,11 @@ bool Game::initialize(int argc, char **argv) {
 
 int Game::run(int argc, char **argv) {
   if (not initialize(argc, argv)) {
+    LOG("Initalization failed");
     return 1;
   }
 
-  Timer timer{1.f / m_config.maxFps * 1000};
+  Timer timer{1.f / m_config.maxFps() * 1000};
   while (not m_context.shouldExit) {
     handleEvents();
     update();
