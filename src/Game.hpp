@@ -1,7 +1,6 @@
 #pragma once
-#include "GameContext.hpp"
 #include "GlobalConfig.hpp"
-#include "Window.hpp"
+#include <SFML/Graphics.hpp>
 #include <memory>
 
 namespace SimpleSnake {
@@ -16,9 +15,8 @@ private:
   void update();
   void draw();
 
-  GameContext m_context;
   std::unique_ptr<GlobalConfig> m_config;
-  std::unique_ptr<Window> m_window;
+  std::unique_ptr<sf::RenderWindow> m_window;
 };
 
 } // namespace SimpleSnake

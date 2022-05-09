@@ -1,18 +1,15 @@
 #include "Game.hpp"
 #include "ConfigLoader.hpp"
-#include "Event.hpp"
-#include "Timer.hpp"
 #include "utils/Log.hpp"
-#include <iostream>
 
 namespace SimpleSnake {
 
 bool Game::initialize(int argc, char **argv) {
-  LOG_DBG("test");
   m_config = ConfigLoader::loadConfig(argc, argv);
   LOG_INF("Loaded configuration: [%s]", m_config->asString().c_str());
 
-  m_window = Window::create();
+  m_window =
+      std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 480), "Snake");
   if (not m_window) {
     return false;
   }
@@ -20,50 +17,40 @@ bool Game::initialize(int argc, char **argv) {
 }
 
 int Game::run(int argc, char **argv) {
+  LOG_DBG("Debug mode enabled");
   if (not initialize(argc, argv)) {
     LOG_ERR("Initalization failed");
     return 1;
   }
 
-  Timer timer{1.f / m_config->maxFps() * 1000};
-  while (not m_context.shouldExit) {
+  const auto frameTimeMs{
+      static_cast<unsigned int>(1.f / m_config->maxFps() * 1000)};
+  sf::Clock clock;
+  while (m_window->isOpen()) {
     handleEvents();
     update();
-    if (timer.nextTick()) {
+    if (clock.getElapsedTime().asMilliseconds() > frameTimeMs) {
       draw();
-      timer.reset();
+      clock.restart();
     }
   }
-  return m_context.exitCode;
+  return 0;
 }
 
 void Game::handleEvents() {
-  Event e;
+  sf::Event e;
   while (m_window->pollEvent(e)) {
-    switch (e.type) {
-    case Event::Type::KeyPressed: {
-      auto key{e.value.keyboard.key};
-      if (key == Keyboard::Key::Escape) {
-        m_context.shouldExit = true;
-      } else if (key == Keyboard::Key::A) {
-        std::cout << "A";
-      }
-      break;
-    }
-    case Event::Type::MouseMoved: {
-      auto pos{e.value.mouse.pos};
-      std::cout << "Move is at (x=" << pos.x << ", y=" << pos.y << ")\n";
-      break;
-    }
-    default: {
-      LOG_WRN("Unhandled event, id = %d", static_cast<int>(e.type));
-    }
+    if (e.type == sf::Event::Closed) {
+      m_window->close();
     }
   }
 }
 
 void Game::update() {}
 
-void Game::draw() { std::cout << "Hello World\n"; }
+void Game::draw() {
+  m_window->clear(sf::Color::Black);
+  m_window->display();
+}
 
 } // namespace SimpleSnake
