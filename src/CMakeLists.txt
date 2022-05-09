@@ -6,8 +6,9 @@ set(
   "Game.cpp"
   "ConfigLoader.cpp"
 )
-
 add_subdirectory(utils)
+add_subdirectory(scene)
+
 add_executable(SimpleSnake ${SNAKE_SOURCES})
 
-target_link_libraries(SimpleSnake PUBLIC utils sfml-window sfml-system sfml-graphics sfml-main) 
+target_link_libraries(SimpleSnake PUBLIC utils scene sfml-window sfml-system sfml-graphics sfml-main) 
