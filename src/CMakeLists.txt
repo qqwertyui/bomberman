@@ -4,13 +4,10 @@ set(
   SNAKE_SOURCES
   "main.cpp"
   "Game.cpp"
-  "Window.cpp"
-  "Timer.cpp"
-  "Keyboard.cpp"
   "ConfigLoader.cpp"
 )
 
 add_subdirectory(utils)
 add_executable(SimpleSnake ${SNAKE_SOURCES})
 
-target_link_libraries(SimpleSnake PUBLIC utils)
+target_link_libraries(SimpleSnake PUBLIC utils sfml-window sfml-system sfml-graphics sfml-main) 
