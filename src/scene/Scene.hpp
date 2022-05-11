@@ -6,10 +6,11 @@ namespace SimpleSnake::scene {
 class SceneManager;
 
 enum class SceneId : unsigned int {
-  Default = 0,
-  Menu = 1,
-  Pause = 2,
-  Running = 3
+  Menu,
+  Settings,
+  Pause,
+  Running,
+  NumberOfScenes
 };
 
 class Scene {

@@ -45,7 +45,7 @@ added in GlobalConfig class manually by:
 class GlobalConfig {
 public:
   PARAMETER(unsigned int, maxFps, 60);
-  PARAMETER(std::string, mapPath, "maps");
+  PARAMETER(std::string, assetsDirectory, "assets/");
 
   std::string asString() {
     std::string result;
