@@ -1,5 +1,5 @@
 #include "SceneManager.hpp"
-#include "../utils/Log.hpp" // todo: change it in cmake
+#include "utils/Log.hpp"
 
 namespace SimpleSnake::scene {
 

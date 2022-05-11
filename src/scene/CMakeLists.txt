@@ -3,8 +3,10 @@ set(
   SCENE_SOURCES
   "${SCENE_DIR}/SceneManager.cpp"
   "${SCENE_DIR}/Scene.cpp"
-  "${SCENE_DIR}/Menu.cpp"
-  "${SCENE_DIR}/Running.cpp"
 )
 
-add_library(scene STATIC ${SCENE_SOURCES})
+add_subdirectory(menu)
+add_subdirectory(running)
+add_subdirectory(settings)
+
+target_sources(SimpleSnake PUBLIC ${SCENE_SOURCES})

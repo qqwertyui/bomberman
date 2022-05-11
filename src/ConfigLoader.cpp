@@ -32,8 +32,8 @@ bool ConfigLoader::isParameterRegistered(const std::string &param) {
 void ConfigLoader::handleParameterSpecific(GlobalConfig &config,
                                            const std::string &param,
                                            const std::string &value) {
-  if (param == "mapPath") {
-    config.mapPath() = value;
+  if (param == "assetsDirectory") {
+    config.assetsDirectory() = value;
   } else if (param == "maxFps") {
     config.maxFps() = std::stoi(value);
   } else {

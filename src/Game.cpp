@@ -1,7 +1,9 @@
 #include "Game.hpp"
 #include "ConfigLoader.hpp"
-#include "scene/Menu.hpp"
-#include "scene/Running.hpp"
+#include "rsrcManagement/TextureManager.hpp"
+#include "scene/menu/Menu.hpp"
+#include "scene/running/Running.hpp"
+#include "scene/settings/Settings.hpp"
 #include "utils/Log.hpp"
 
 namespace SimpleSnake {
@@ -13,9 +15,12 @@ Game::createSceneManager(sf::RenderWindow &window) {
       std::make_unique<scene::Menu>(*sceneMgr, window, scene::SceneId::Menu);
   auto running = std::make_unique<scene::Running>(*sceneMgr, window,
                                                   scene::SceneId::Running);
+  auto settings = std::make_unique<scene::Settings>(*sceneMgr, window,
+                                                    scene::SceneId::Settings);
 
   sceneMgr->add(std::move(menu));
   sceneMgr->add(std::move(running));
+  sceneMgr->add(std::move(settings));
   sceneMgr->change(scene::SceneId::Menu);
   return sceneMgr;
 }
@@ -23,6 +28,10 @@ Game::createSceneManager(sf::RenderWindow &window) {
 bool Game::initialize(int argc, char **argv) {
   m_config = ConfigLoader::loadConfig(argc, argv);
   LOG_INF("Loaded configuration: [%s]", m_config->asString().c_str());
+
+  auto &txtManager = rsrcManagement::TextureManager::instance();
+  txtManager.load(rsrcManagement::TextureId::BUTTON_NORMAL,
+                  m_config->assetsDirectory() + "redNormal.png");
 
   m_window =
       std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 480), "Snake");

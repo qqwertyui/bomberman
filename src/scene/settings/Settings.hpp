@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Scene.hpp"
+#include "scene/Scene.hpp"
 
 namespace SimpleSnake::scene {
-class Menu : public Scene {
+class Settings : public Scene {
 public:
-  Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
-       const SceneId &sceneId);
+  Settings(SceneManager &sceneMgr, sf::RenderWindow &window,
+           const SceneId &sceneId);
 
   void handleEvents() override;
   void update() override;

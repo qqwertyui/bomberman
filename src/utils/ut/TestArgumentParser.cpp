@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../ArgumentParser.cpp"
+#include "utils/ArgumentParser.cpp"
 
 namespace SimpleSnake {
 class TestArgumentParser : public ::testing::Test {
