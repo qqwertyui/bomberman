@@ -1,12 +1,18 @@
 #pragma once
 
 #include "utils/Log.hpp"
+#include <iostream>
 #include <map>
 
 namespace SimpleSnake::rsrcManagement {
 template <typename ResourceType, typename ResourceIdType>
 class ResourceManager {
 public:
+  ResourceManager(const ResourceManager &) = delete;
+  ResourceManager(ResourceManager &&) = delete;
+  ResourceManager &operator=(const ResourceManager &) = delete;
+  ResourceManager &operator=(ResourceManager &&) = delete;
+
   static ResourceManager<ResourceType, ResourceIdType> &instance() {
     static ResourceManager<ResourceType, ResourceIdType> instance;
     return instance;
@@ -26,7 +32,7 @@ public:
       LOG_WRN("Couldn't retreive resource");
       return invalidResource;
     }
-    return resourceMap[id];
+    return resourceMap.at(id);
   }
 
 private:

@@ -7,9 +7,18 @@ namespace SimpleSnake::scene {
 Menu::Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
            const SceneId &sceneId)
     : Scene(sceneMgr, window, sceneId) {
-  buttons.emplace_back(new interface::Button("Start"));
-  buttons.emplace_back(new interface::Button("Settings"));
-  buttons.emplace_back(new interface::Button("Exit"));
+  buttons.emplace(ButtonId::Start, interface::Button("Start"));
+  buttons.emplace(ButtonId::Settings, interface::Button("Settings"));
+  buttons.emplace(ButtonId::Exit, interface::Button("Exit"));
+
+  buttons[m_activeButton].setActive(true);
+
+  sf::Vector2f buttonPosition{};
+  buttons[ButtonId::Start].setPosition(buttonPosition);
+  buttonPosition.y += 60;
+  buttons[ButtonId::Settings].setPosition(buttonPosition);
+  buttonPosition.y += 60;
+  buttons[ButtonId::Exit].setPosition(buttonPosition);
 }
 
 void Menu::handleEvents() {
@@ -27,7 +36,9 @@ void Menu::update() {}
 
 void Menu::draw() {
   m_window.clear(sf::Color::Red);
-  m_window.draw(*buttons[0]); // temp
+  for (auto &button : buttons) {
+    m_window.draw(button.second);
+  }
   m_window.display();
 }
 
@@ -35,18 +46,18 @@ void Menu::handleKeyEvent(const sf::Event::KeyEvent &keyEvent) {
   if (keyEvent.code == sf::Keyboard::Escape) {
     m_window.close();
   } else if (keyEvent.code == sf::Keyboard::Up) {
-    if (m_activeButton == ButtonId::Start) {
-      m_activeButton = ButtonId::Exit;
-    } else {
+    if (m_activeButton < ButtonId::Start) {
+      buttons[m_activeButton].setActive(false);
       m_activeButton =
           static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) + 1);
+      buttons[m_activeButton].setActive(true);
     }
   } else if (keyEvent.code == sf::Keyboard::Down) {
-    if (m_activeButton == ButtonId::Exit) {
-      m_activeButton = ButtonId::Start;
-    } else {
+    if (m_activeButton > ButtonId::Exit) {
+      buttons[m_activeButton].setActive(false);
       m_activeButton =
           static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) - 1);
+      buttons[m_activeButton].setActive(true);
     }
   } else if (keyEvent.code == sf::Keyboard::Enter) {
     if (m_activeButton == ButtonId::Exit) {

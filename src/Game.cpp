@@ -29,15 +29,16 @@ bool Game::initialize(int argc, char **argv) {
   m_config = ConfigLoader::loadConfig(argc, argv);
   LOG_INF("Loaded configuration: [%s]", m_config->asString().c_str());
 
-  auto &txtManager = rsrcManagement::TextureManager::instance();
-  txtManager.load(rsrcManagement::TextureId::BUTTON_NORMAL,
-                  m_config->assetsDirectory() + "redNormal.png");
-
   m_window =
       std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 480), "Snake");
   if (not m_window) {
     return false;
   }
+  auto &txtManager = rsrcManagement::TextureManager::instance();
+  txtManager.load(rsrcManagement::TextureId::BUTTON_ACTIVE,
+                  m_config->assetsDirectory() + "buttonActive.png");
+  txtManager.load(rsrcManagement::TextureId::BUTTON_INACTIVE,
+                  m_config->assetsDirectory() + "buttonInactive.png");
 
   m_sceneMgr = createSceneManager(*m_window);
   return true;

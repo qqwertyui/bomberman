@@ -2,7 +2,7 @@
 
 #include "interface/Button.hpp"
 #include "scene/Scene.hpp"
-#include <memory>
+#include <map>
 
 namespace SimpleSnake::scene {
 class Menu : public Scene {
@@ -19,7 +19,6 @@ private:
 
   enum class ButtonId : unsigned int { Exit, Settings, Start, NumberOfButtons };
   ButtonId m_activeButton{ButtonId::Start};
-
-  std::vector<std::unique_ptr<interface::Button>> buttons;
+  std::map<ButtonId, interface::Button> buttons;
 };
 } // namespace SimpleSnake::scene
