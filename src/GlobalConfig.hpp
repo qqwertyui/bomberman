@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace SimpleSnake {
-
+class ConfigLoader;
 /*
 Only string and numeric types are allowed!
 */
@@ -46,8 +46,9 @@ class GlobalConfig {
 public:
   PARAMETER(unsigned int, maxFps, 60);
   PARAMETER(std::string, assetsDirectory, "assets/");
+  PARAMETER(std::string, menuFontPath, "C:/Windows/Fonts/Inkfree.ttf");
 
-  std::string asString() {
+  inline std::string asString() {
     std::string result;
     for (auto &parameter : parameters) {
       result += parameter->asString() + ",";
@@ -55,12 +56,24 @@ public:
     result.pop_back();
     return result;
   }
-  static const std::vector<ParameterBase *> &getRegisteredParameters() {
+  inline static std::string getRegisteredNames() {
+    std::string result;
+    for (auto &parameter : parameters) {
+      result += parameter->getName() + ",";
+    }
+    result.pop_back();
+    return result;
+  }
+  inline static const std::vector<ParameterBase *> &getRegisteredParameters() {
     return parameters;
   }
+  inline bool isHelp() const { return isHelpFlag; }
 
 private:
+  bool isHelpFlag{false};
   static std::vector<ParameterBase *> parameters;
+
+  friend class ConfigLoader;
 };
 
 inline std::vector<ParameterBase *> GlobalConfig::parameters{};

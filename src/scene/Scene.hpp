@@ -25,7 +25,7 @@ public:
   virtual void update() = 0;
   virtual void draw() = 0;
   void change(const SceneId &sceneId);
-  SceneId getId() const { return m_sceneId; }
+  inline SceneId getId() const { return m_sceneId; }
 
 protected:
   const SceneId m_sceneId;

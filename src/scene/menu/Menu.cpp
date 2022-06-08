@@ -7,18 +7,14 @@ namespace SimpleSnake::scene {
 Menu::Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
            const SceneId &sceneId)
     : Scene(sceneMgr, window, sceneId) {
-  buttons.emplace(ButtonId::Start, interface::Button("Start"));
-  buttons.emplace(ButtonId::Settings, interface::Button("Settings"));
-  buttons.emplace(ButtonId::Exit, interface::Button("Exit"));
+  buttons.emplace(ButtonId::Start,
+                  interface::Button(sf::Vector2f(0, 0), "Start"));
+  buttons.emplace(ButtonId::Settings,
+                  interface::Button(sf::Vector2f(0, 60), "Settings"));
+  buttons.emplace(ButtonId::Exit,
+                  interface::Button(sf::Vector2f(0, 120), "Exit"));
 
-  buttons[m_activeButton].setActive(true);
-
-  sf::Vector2f buttonPosition{};
-  buttons[ButtonId::Start].setPosition(buttonPosition);
-  buttonPosition.y += 60;
-  buttons[ButtonId::Settings].setPosition(buttonPosition);
-  buttonPosition.y += 60;
-  buttons[ButtonId::Exit].setPosition(buttonPosition);
+  buttons[ButtonId::Start].setActive(true);
 }
 
 void Menu::handleEvents() {
@@ -68,7 +64,6 @@ void Menu::handleKeyEvent(const sf::Event::KeyEvent &keyEvent) {
       change(SceneId::Running);
     }
   }
-  std::cout << static_cast<unsigned int>(m_activeButton) << "\n";
 }
 
 } // namespace SimpleSnake::scene
