@@ -10,6 +10,10 @@ std::unique_ptr<GlobalConfig> ConfigLoader::loadConfig(int argc, char **argv) {
   auto cmdLineArgs = ArgumentParser::parse(argc, argv);
 
   for (const auto &[param, value] : cmdLineArgs) {
+    if (param == "help") {
+      config->isHelpFlag = true;
+      break;
+    }
     if (not isParameterRegistered(param)) {
       LOG_WRN("Unrecognized argument: %s", param.c_str());
       continue;
@@ -36,6 +40,8 @@ void ConfigLoader::handleParameterSpecific(GlobalConfig &config,
     config.assetsDirectory() = value;
   } else if (param == "maxFps") {
     config.maxFps() = std::stoi(value);
+  } else if (param == "menuFontPath") {
+    config.menuFontPath() = value;
   } else {
     LOG_WRN("Unhandled argument: %s", param.c_str());
   }

@@ -1,5 +1,6 @@
 #include "SceneManager.hpp"
 #include "utils/Log.hpp"
+#include <algorithm>
 
 namespace SimpleSnake::scene {
 

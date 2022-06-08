@@ -1,5 +1,6 @@
 #include "Game.hpp"
 #include "ConfigLoader.hpp"
+#include "rsrcManagement/FontManager.hpp"
 #include "rsrcManagement/TextureManager.hpp"
 #include "scene/menu/Menu.hpp"
 #include "scene/running/Running.hpp"
@@ -27,10 +28,15 @@ Game::createSceneManager(sf::RenderWindow &window) {
 
 bool Game::initialize(int argc, char **argv) {
   m_config = ConfigLoader::loadConfig(argc, argv);
+  if (m_config->isHelp()) {
+    LOG_INF("Possible parameters are [%s]",
+            m_config->getRegisteredNames().c_str());
+    return false;
+  }
   LOG_INF("Loaded configuration: [%s]", m_config->asString().c_str());
 
-  m_window =
-      std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 480), "Snake");
+  m_window = std::make_unique<sf::RenderWindow>(
+      sf::VideoMode(sf::Vector2u(640, 480)), "Snake");
   if (not m_window) {
     return false;
   }
@@ -39,6 +45,9 @@ bool Game::initialize(int argc, char **argv) {
                   m_config->assetsDirectory() + "buttonActive.png");
   txtManager.load(rsrcManagement::TextureId::BUTTON_INACTIVE,
                   m_config->assetsDirectory() + "buttonInactive.png");
+
+  auto &fontManager = rsrcManagement::FontManager::instance();
+  fontManager.load(rsrcManagement::FontId::MENU, m_config->menuFontPath());
 
   m_sceneMgr = createSceneManager(*m_window);
   return true;
