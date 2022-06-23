@@ -6,4 +6,4 @@ set(
 )
 
 add_executable(bomberman-server ${SERVER_SOURCES})
-target_link_libraries(bomberman-server pthread common)
+target_link_libraries(bomberman-server pthread common messages)

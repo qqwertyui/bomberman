@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package bomberman;
+
+message ServerInfo {
+  required string version = 1;
+
+  message Lobby {
+    required int32 id = 1;
+    required int32 players = 2;
+  }
+
+  repeated Lobby lobbies = 3;
+}

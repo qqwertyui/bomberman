@@ -2,12 +2,14 @@
 #include <cstring>
 #include <errno.h>
 #include <netinet/in.h>
+#include <string>
 #include <sys/socket.h>
 #include <thread>
 #include <unistd.h>
 
 #include "ConfigLoader.hpp"
 #include "common/Log.hpp"
+#include "messages/serverInfo.pb.h"
 
 struct ClientInfo {
   int fd;
@@ -18,8 +20,18 @@ struct ClientInfo {
 void handleClient(const ClientInfo clientInfo) {
   LOG_INF("[+] Connected from %s:%u", clientInfo.ip.c_str(), clientInfo.port);
 
-  while (1)
-    ;
+  bomberman::ServerInfo si;
+  si.set_version("0.1");
+  bomberman::ServerInfo::Lobby *lobby1 = si.add_lobbies();
+  lobby1->set_id(1);
+  lobby1->set_players(0);
+  bomberman::ServerInfo::Lobby *lobby2 = si.add_lobbies();
+  lobby2->set_id(2);
+  lobby2->set_players(0);
+
+  std::string message;
+  si.SerializeToString(&message);
+  send(clientInfo.fd, (const void *)message.c_str(), message.size(), 0);
 
   close(clientInfo.fd);
   LOG_INF("[-] Disconnected from %s:%u", clientInfo.ip.c_str(),
@@ -27,6 +39,8 @@ void handleClient(const ClientInfo clientInfo) {
 }
 
 int main(int argc, char **argv) {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
   bomberman::ConfigLoader configLoader{argc, argv};
   const auto &config{configLoader.get()};
   int serverFd = socket(AF_INET, SOCK_STREAM, 0);
