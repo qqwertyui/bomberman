@@ -12,4 +12,4 @@ add_executable(bomberman-client ${CLIENT_SOURCES})
 add_subdirectory(interface)
 add_subdirectory(scene)
 
-target_link_libraries(bomberman-client PUBLIC common sfml-window sfml-system sfml-graphics sfml-main)
+target_link_libraries(bomberman-client PUBLIC common messages sfml-window sfml-system sfml-graphics sfml-main)

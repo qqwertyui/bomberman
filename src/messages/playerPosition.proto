@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package bomberman;
+
+message PlayerPosition {
+  required int32 positionX = 1;
+  required int32 positionY = 2;
+}
