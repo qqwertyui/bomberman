@@ -9,4 +9,4 @@ add_subdirectory(menu)
 add_subdirectory(running)
 add_subdirectory(settings)
 
-target_sources(bomberman PUBLIC ${SCENE_SOURCES})
+target_sources(bomberman-client PUBLIC ${SCENE_SOURCES})

@@ -4,4 +4,4 @@ set(
   "${INTERFACE_DIR}/Button.cpp"
 )
 
-target_sources(bomberman PUBLIC ${INTERFACE_SOURCES})
+target_sources(bomberman-client PUBLIC ${INTERFACE_SOURCES})

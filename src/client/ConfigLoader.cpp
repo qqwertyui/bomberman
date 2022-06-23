@@ -7,7 +7,7 @@
 namespace bomberman {
 std::unique_ptr<GlobalConfig> ConfigLoader::loadConfig(int argc, char **argv) {
   auto config = std::make_unique<GlobalConfig>();
-  auto cmdLineArgs = ArgumentParser::parse(argc, argv);
+  auto cmdLineArgs = common::ArgumentParser::parse(argc, argv);
 
   for (const auto &[param, value] : cmdLineArgs) {
     if (param == "help") {

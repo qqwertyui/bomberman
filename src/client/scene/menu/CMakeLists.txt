@@ -4,4 +4,4 @@ set(
   "${SCENE_MENU_DIR}/Menu.cpp"
 )
 
-target_sources(bomberman PUBLIC ${SCENE_MENU_SOURCES})
+target_sources(bomberman-client PUBLIC ${SCENE_MENU_SOURCES})
