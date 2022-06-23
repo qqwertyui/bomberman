@@ -4,4 +4,4 @@ set(
   "${SCENE_RUNNING_DIR}/Running.cpp"
 )
 
-target_sources(bomberman PUBLIC ${SCENE_RUNNING_SOURCES})
+target_sources(bomberman-client PUBLIC ${SCENE_RUNNING_SOURCES})
