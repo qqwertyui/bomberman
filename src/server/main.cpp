@@ -36,6 +36,7 @@ void handleClient(const ClientInfo clientInfo) {
             clientInfo.port, playerPos.positionx(), playerPos.positiony());
   } while (playerPos.positionx() != 0 or playerPos.positiony() != 0);
 
+  shutdown(clientInfo.fd, SHUT_RDWR);
   close(clientInfo.fd);
   LOG_INF("[-] Disconnected from %s:%u", clientInfo.ip.c_str(),
           clientInfo.port);

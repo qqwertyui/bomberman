@@ -12,7 +12,6 @@ Running::Running(SceneManager &sceneMgr, sf::RenderWindow &window,
     : Scene(sceneMgr, window, sceneId) {}
 
 void Running::handleEvents() {
-  static int x = 10, y = 10;
   sf::Event e;
   while (m_window.pollEvent(e)) {
     if (e.type == sf::Event::Closed) {
@@ -34,6 +33,8 @@ void Running::handleEvents() {
 }
 
 void Running::onEntry() {
+  x = 10;
+  y = 10;
   connMgr.connect(GlobalConfig::get().serverIp(),
                   GlobalConfig::get().serverPort());
   auto si = connMgr.receive<bomberman::ServerInfo>();

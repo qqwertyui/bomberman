@@ -11,9 +11,6 @@ public:
   static void loadConfig(int argc, char **argv);
 
 private:
-  static void handleParameterSpecific(GlobalConfig &config,
-                                      const std::string &param,
-                                      const std::string &value);
   static bool isParameterRegistered(const std::string &param);
 };
 } // namespace bomberman

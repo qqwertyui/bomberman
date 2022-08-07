@@ -1,47 +1,74 @@
 #pragma once
 
-#include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace bomberman {
 class ConfigLoader;
-/*
-Only string and numeric types are allowed!
-*/
-template <typename T> inline std::string toString(const T &value) {
+
+// integral types
+template <typename T, std::enable_if_t<std::is_integral<T>::value &&
+                                           not std::is_same<T, bool>::value,
+                                       bool> = true>
+inline T fromString(const std::string &value) {
+  return std::stoi(value);
+}
+template <typename T, std::enable_if_t<std::is_integral<T>::value &&
+                                           not std::is_same<T, bool>::value,
+                                       bool> = true>
+inline std::string toString(const T &value) {
   return std::to_string(value);
 }
-template <> inline std::string toString(const std::string &value) {
+
+// std::string
+template <typename T,
+          std::enable_if_t<std::is_same<T, std::string>::value, bool> = true>
+inline std::string fromString(const std::string &value) {
   return value;
+}
+template <typename T,
+          std::enable_if_t<std::is_same<T, std::string>::value, bool> = true>
+inline std::string toString(const T &value) {
+  return value;
+}
+
+// boolean types
+template <typename T,
+          std::enable_if_t<std::is_same<T, bool>::value, bool> = true>
+inline bool fromString(const std::string &value) {
+  return (value.compare("true") == 0);
+}
+template <typename T,
+          std::enable_if_t<std::is_same<T, bool>::value, bool> = true>
+inline std::string toString(const T &value) {
+  return value ? "true" : "false";
 }
 
 class ParameterBase {
 public:
   virtual std::string asString() const = 0;
   virtual std::string getName() const = 0;
+  virtual void loadFromString(const std::string &newValue) = 0;
 };
 
 #define PARAMETER(type, name, value)                                           \
   class class_##name : public ParameterBase {                                  \
   public:                                                                      \
     class_##name() { GlobalConfig::parameters.push_back(this); }               \
-    std::string asString() const {                                             \
-      return #name + std::string("=") + toString(this->name);                  \
+    std::string asString() const override {                                    \
+      return #name + std::string("=") + toString<type>(m_value);               \
     }                                                                          \
-    std::string getName() const { return #name; }                              \
-    type &operator()() { return this->name; }                                  \
+    std::string getName() const override { return #name; }                     \
+    type &operator()() { return m_value; }                                     \
+    void loadFromString(const std::string &newValue) override {                \
+      m_value = fromString<type>(newValue);                                    \
+    }                                                                          \
                                                                                \
   private:                                                                     \
-    type name{value};                                                          \
+    type m_value{value};                                                       \
   } name;
 
-/*
-Until some universal method is developed, every newly added parameter has to be
-added in GlobalConfig class manually by:
-- adding PARAMETER entry
-- updating handleParameterSpecific in ConfigLoader.cpp
-*/
 class GlobalConfig {
 public:
   GlobalConfig(const GlobalConfig &) = delete;
@@ -62,7 +89,7 @@ public:
     result.pop_back();
     return result;
   }
-  inline static std::string getRegisteredNames() {
+  inline std::string getRegisteredNames() {
     std::string result;
     for (auto &parameter : parameters) {
       result += parameter->getName() + ",";
@@ -70,26 +97,24 @@ public:
     result.pop_back();
     return result;
   }
-  inline static const std::vector<ParameterBase *> &getRegisteredParameters() {
+  inline const std::vector<ParameterBase *> &getRegisteredParameters() {
     return parameters;
   }
-  inline bool isHelp() const { return isHelpFlag; }
 
+  PARAMETER(bool, isHelp, false);
   PARAMETER(uint16_t, maxFps, 60);
-  PARAMETER(std::string, assetsDirectory, "assets/");
-  PARAMETER(std::string, menuFontPath, "C:/Windows/Fonts/Inkfree.ttf");
+  PARAMETER(std::string, assetsDir, "assets/");
+  PARAMETER(std::string, fontsDir, "C:/Windows/Fonts/Inkfree.ttf");
   PARAMETER(std::string, serverIp, "127.0.0.1");
   PARAMETER(uint16_t, serverPort, 5551);
+  PARAMETER(uint16_t, windowWidth, 640);
+  PARAMETER(uint16_t, windowHeight, 480);
 
 private:
   GlobalConfig() = default;
 
-  bool isHelpFlag{false};
-  static std::vector<ParameterBase *> parameters;
-
+  static inline std::vector<ParameterBase *> parameters;
   friend class ConfigLoader;
 };
-
-inline std::vector<ParameterBase *> GlobalConfig::parameters{};
 
 } // namespace bomberman
