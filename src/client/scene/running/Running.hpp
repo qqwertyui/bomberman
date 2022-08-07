@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/ConnectionManager.hpp"
 #include "scene/Scene.hpp"
 
 namespace bomberman::scene {
@@ -11,5 +12,10 @@ public:
   void handleEvents() override;
   void update() override;
   void draw() override;
+  void onEntry() override;
+  void onLeave() override;
+
+private:
+  common::ConnectionManager connMgr;
 };
 } // namespace bomberman::scene

@@ -19,7 +19,6 @@ private:
   std::unique_ptr<scene::SceneManager>
   createSceneManager(sf::RenderWindow &window);
 
-  std::unique_ptr<GlobalConfig> m_config;
   std::unique_ptr<scene::SceneManager> m_sceneMgr;
   std::unique_ptr<sf::RenderWindow> m_window;
 };

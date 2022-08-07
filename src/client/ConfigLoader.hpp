@@ -8,7 +8,7 @@ class GlobalConfig;
 
 class ConfigLoader {
 public:
-  static std::unique_ptr<GlobalConfig> loadConfig(int argc, char **argv);
+  static void loadConfig(int argc, char **argv);
 
 private:
   static void handleParameterSpecific(GlobalConfig &config,
