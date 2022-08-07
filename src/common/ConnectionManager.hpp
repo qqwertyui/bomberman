@@ -28,6 +28,7 @@ public:
       return;
     }
     fileDescriptor = socket_fd;
+    LOG_DBG("Connected");
   }
 
   void disconnect() {
@@ -37,9 +38,10 @@ public:
     }
     ::closeConnection(fileDescriptor.value());
     fileDescriptor.reset();
+    LOG_DBG("Disconnected");
   }
 
-  template <typename Message> void send(const Message &msg) const {
+  template <typename Message> void send(const Message &msg) {
     if (not fileDescriptor.has_value()) {
       LOG_ERR("Not connected");
       return;
@@ -47,15 +49,21 @@ public:
     std::string serializedMsg;
     msg.SerializeToString(&serializedMsg);
     unsigned int byteSizeLong = msg.ByteSizeLong();
-    ::send(fileDescriptor.value(), (const char *)&byteSizeLong,
-           sizeof(byteSizeLong), 0);
-    ::send(fileDescriptor.value(), (const char *)serializedMsg.c_str(),
-           serializedMsg.size(), 0);
+    int status = ::send(fileDescriptor.value(), (const char *)&byteSizeLong,
+                        sizeof(byteSizeLong), 0);
+    if (isConnectionError(status)) {
+      return;
+    }
+    status = ::send(fileDescriptor.value(), (const char *)serializedMsg.c_str(),
+                    serializedMsg.size(), 0);
+    if (isConnectionError(status)) {
+      return;
+    }
     LOG_DBG("Sent message %s [%u bytes]", msg.GetTypeName().c_str(),
             byteSizeLong);
   }
 
-  template <typename Message> std::optional<Message> receive() const {
+  template <typename Message> std::optional<Message> receive() {
     if (not fileDescriptor.has_value()) {
       LOG_ERR("Not connected");
       return std::nullopt;
@@ -72,6 +80,15 @@ public:
     LOG_DBG("Received message %s [%u bytes]", msg.GetTypeName().c_str(),
             byteSizeLong);
     return msg;
+  }
+
+  bool isConnectionError(int statusCode) {
+    if (statusCode == -1) {
+      LOG_ERR("Connection error: %s", strerror(statusCode));
+      disconnect();
+      return true;
+    }
+    return false;
   }
 
 private:

@@ -42,18 +42,20 @@ bool Game::initialize(int argc, char **argv) {
   }
 
   m_window = std::make_unique<sf::RenderWindow>(
-      sf::VideoMode(sf::Vector2u(640, 480)), "Snake");
+      sf::VideoMode(sf::Vector2u(GlobalConfig::get().windowWidth(),
+                                 GlobalConfig::get().windowHeight())),
+      "Snake");
   if (not m_window) {
     return false;
   }
   auto &txtManager = rsrcManagement::TextureManager::instance();
   txtManager.load(rsrcManagement::TextureId::BUTTON_ACTIVE,
-                  globalConfig.assetsDirectory() + "buttonActive.png");
+                  globalConfig.assetsDir() + "buttonActive.png");
   txtManager.load(rsrcManagement::TextureId::BUTTON_INACTIVE,
-                  globalConfig.assetsDirectory() + "buttonInactive.png");
+                  globalConfig.assetsDir() + "buttonInactive.png");
 
   auto &fontManager = rsrcManagement::FontManager::instance();
-  fontManager.load(rsrcManagement::FontId::MENU, globalConfig.menuFontPath());
+  fontManager.load(rsrcManagement::FontId::MENU, globalConfig.fontsDir());
 
   m_sceneMgr = createSceneManager(*m_window);
   return true;

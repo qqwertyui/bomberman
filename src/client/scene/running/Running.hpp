@@ -17,5 +17,6 @@ public:
 
 private:
   common::ConnectionManager connMgr;
+  int x, y;
 };
 } // namespace bomberman::scene
