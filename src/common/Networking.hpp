@@ -6,9 +6,10 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
-#include <string>
+#include <cstring>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 inline bool initNetworking() { return true; }
 inline void closeConnection(int fd) { close(fd); }
