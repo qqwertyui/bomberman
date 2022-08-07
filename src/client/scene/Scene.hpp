@@ -24,6 +24,8 @@ public:
   virtual void handleEvents() = 0;
   virtual void update() = 0;
   virtual void draw() = 0;
+  virtual void onEntry(){};
+  virtual void onLeave(){};
   void change(const SceneId &sceneId);
   inline SceneId getId() const { return m_sceneId; }
 

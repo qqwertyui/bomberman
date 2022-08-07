@@ -5,22 +5,21 @@
 #include <algorithm>
 
 namespace bomberman {
-std::unique_ptr<GlobalConfig> ConfigLoader::loadConfig(int argc, char **argv) {
-  auto config = std::make_unique<GlobalConfig>();
+void ConfigLoader::loadConfig(int argc, char **argv) {
+  auto &config = GlobalConfig::get();
   auto cmdLineArgs = common::ArgumentParser::parse(argc, argv);
 
   for (const auto &[param, value] : cmdLineArgs) {
     if (param == "help") {
-      config->isHelpFlag = true;
+      config.isHelpFlag = true;
       break;
     }
     if (not isParameterRegistered(param)) {
       LOG_WRN("Unrecognized argument: %s", param.c_str());
       continue;
     }
-    handleParameterSpecific(*config, param, value);
+    handleParameterSpecific(config, param, value);
   }
-  return config;
 }
 
 bool ConfigLoader::isParameterRegistered(const std::string &param) {
@@ -42,6 +41,10 @@ void ConfigLoader::handleParameterSpecific(GlobalConfig &config,
     config.maxFps() = std::stoi(value);
   } else if (param == "menuFontPath") {
     config.menuFontPath() = value;
+  } else if (param == "serverIp") {
+    config.serverIp() = value;
+  } else if (param == "serverPort") {
+    config.serverPort() = std::stoi(value);
   } else {
     LOG_WRN("Unhandled argument: %s", param.c_str());
   }

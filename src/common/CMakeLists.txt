@@ -4,4 +4,8 @@ set(COMMON_SOURCES
 )
 
 add_library(common STATIC ${COMMON_SOURCES})
+if (WIN32)
+  target_link_libraries(common PUBLIC ws2_32)
+endif (WIN32)
+
 add_subdirectory(ut)

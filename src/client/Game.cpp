@@ -27,13 +27,19 @@ Game::createSceneManager(sf::RenderWindow &window) {
 }
 
 bool Game::initialize(int argc, char **argv) {
-  m_config = ConfigLoader::loadConfig(argc, argv);
-  if (m_config->isHelp()) {
+  ConfigLoader::loadConfig(argc, argv);
+  auto &globalConfig{GlobalConfig::get()};
+  if (globalConfig.isHelp()) {
     LOG_INF("Possible parameters are [%s]",
-            m_config->getRegisteredNames().c_str());
+            globalConfig.getRegisteredNames().c_str());
     return false;
   }
-  LOG_INF("Loaded configuration: [%s]", m_config->asString().c_str());
+  LOG_INF("Loaded configuration: [%s]", globalConfig.asString().c_str());
+
+  if (not initNetworking()) {
+    LOG_ERR("Networking initialization failed");
+    return false;
+  }
 
   m_window = std::make_unique<sf::RenderWindow>(
       sf::VideoMode(sf::Vector2u(640, 480)), "Snake");
@@ -42,12 +48,12 @@ bool Game::initialize(int argc, char **argv) {
   }
   auto &txtManager = rsrcManagement::TextureManager::instance();
   txtManager.load(rsrcManagement::TextureId::BUTTON_ACTIVE,
-                  m_config->assetsDirectory() + "buttonActive.png");
+                  globalConfig.assetsDirectory() + "buttonActive.png");
   txtManager.load(rsrcManagement::TextureId::BUTTON_INACTIVE,
-                  m_config->assetsDirectory() + "buttonInactive.png");
+                  globalConfig.assetsDirectory() + "buttonInactive.png");
 
   auto &fontManager = rsrcManagement::FontManager::instance();
-  fontManager.load(rsrcManagement::FontId::MENU, m_config->menuFontPath());
+  fontManager.load(rsrcManagement::FontId::MENU, globalConfig.menuFontPath());
 
   m_sceneMgr = createSceneManager(*m_window);
   return true;
@@ -61,7 +67,7 @@ int Game::run(int argc, char **argv) {
   }
 
   const auto frameTimeMs{
-      static_cast<unsigned int>(1.f / m_config->maxFps() * 1000)};
+      static_cast<unsigned int>(1.f / GlobalConfig::get().maxFps() * 1000)};
   sf::Clock clock;
   while (m_window->isOpen()) {
     handleEvents();

@@ -28,7 +28,13 @@ void SceneManager::change(const SceneId &sceneId) {
             static_cast<unsigned int>(sceneId));
     return;
   }
-  activeScene = scene;
+  if (scene != activeScene) {
+    if (activeScene) {
+      activeScene->onLeave();
+    }
+    scene->onEntry();
+    activeScene = scene;
+  }
 }
 
 Scene *SceneManager::getSceneById(const SceneId &sceneId) {

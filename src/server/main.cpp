@@ -1,15 +1,12 @@
-#include <arpa/inet.h>
-#include <cstring>
-#include <errno.h>
-#include <netinet/in.h>
-#include <string>
-#include <sys/socket.h>
+#include "ConfigLoader.hpp"
+#include "common/ConnectionManager.hpp"
+#include "common/Log.hpp"
+#include "common/Networking.hpp"
+#include "messages/playerPosition.pb.h"
+#include "messages/serverInfo.pb.h"
+
 #include <thread>
 #include <unistd.h>
-
-#include "ConfigLoader.hpp"
-#include "common/Log.hpp"
-#include "messages/serverInfo.pb.h"
 
 struct ClientInfo {
   int fd;
@@ -29,9 +26,15 @@ void handleClient(const ClientInfo clientInfo) {
   lobby2->set_id(2);
   lobby2->set_players(0);
 
-  std::string message;
-  si.SerializeToString(&message);
-  send(clientInfo.fd, (const void *)message.c_str(), message.size(), 0);
+  bomberman::common::ConnectionManager connMgr{clientInfo.fd};
+  connMgr.send(si);
+
+  bomberman::PlayerPosition playerPos{};
+  do {
+    playerPos = connMgr.receive<bomberman::PlayerPosition>().value();
+    LOG_INF("User %s:%u position: [x=%d, y=%d]", clientInfo.ip.c_str(),
+            clientInfo.port, playerPos.positionx(), playerPos.positiony());
+  } while (playerPos.positionx() != 0 or playerPos.positiony() != 0);
 
   close(clientInfo.fd);
   LOG_INF("[-] Disconnected from %s:%u", clientInfo.ip.c_str(),
@@ -43,6 +46,11 @@ int main(int argc, char **argv) {
 
   bomberman::ConfigLoader configLoader{argc, argv};
   const auto &config{configLoader.get()};
+
+  if (not initNetworking()) {
+    LOG_ERR("Networking initialization failed");
+    return 1;
+  }
   int serverFd = socket(AF_INET, SOCK_STREAM, 0);
   if (serverFd == -1) {
     LOG_ERR("Socket creation failed: %s", strerror(errno));

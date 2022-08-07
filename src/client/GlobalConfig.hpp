@@ -44,9 +44,15 @@ added in GlobalConfig class manually by:
 */
 class GlobalConfig {
 public:
-  PARAMETER(unsigned int, maxFps, 60);
-  PARAMETER(std::string, assetsDirectory, "assets/");
-  PARAMETER(std::string, menuFontPath, "C:/Windows/Fonts/Inkfree.ttf");
+  GlobalConfig(const GlobalConfig &) = delete;
+  GlobalConfig(const GlobalConfig &&) = delete;
+  GlobalConfig &operator=(const GlobalConfig &) = delete;
+  GlobalConfig &operator=(const GlobalConfig &&) = delete;
+
+  inline static GlobalConfig &get() {
+    static GlobalConfig globalConfig;
+    return globalConfig;
+  }
 
   inline std::string asString() {
     std::string result;
@@ -69,7 +75,15 @@ public:
   }
   inline bool isHelp() const { return isHelpFlag; }
 
+  PARAMETER(uint16_t, maxFps, 60);
+  PARAMETER(std::string, assetsDirectory, "assets/");
+  PARAMETER(std::string, menuFontPath, "C:/Windows/Fonts/Inkfree.ttf");
+  PARAMETER(std::string, serverIp, "127.0.0.1");
+  PARAMETER(uint16_t, serverPort, 5551);
+
 private:
+  GlobalConfig() = default;
+
   bool isHelpFlag{false};
   static std::vector<ParameterBase *> parameters;
 
