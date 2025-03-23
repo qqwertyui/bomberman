@@ -15,7 +15,7 @@ public:
   void draw() override;
 
 private:
-  void handleKeyEvent(const sf::Event::KeyEvent &keyEvent);
+  void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
 
   enum class ButtonId : unsigned int { Exit, Settings, Start, NumberOfButtons };
   ButtonId m_activeButton{ButtonId::Start};
