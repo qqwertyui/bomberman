@@ -2,8 +2,8 @@
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
 #include "common/Networking.hpp"
-#include "messages/playerPosition.pb.h"
-#include "messages/serverInfo.pb.h"
+#include "common/messages/playerPosition.pb.h"
+#include "common/messages/serverInfo.pb.h"
 
 #include <thread>
 #include <unistd.h>

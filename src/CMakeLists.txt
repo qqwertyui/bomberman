@@ -1,8 +1,6 @@
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_subdirectory(messages)
 add_subdirectory(common)
 
 if(DEFINED CLIENT_ONLY)
