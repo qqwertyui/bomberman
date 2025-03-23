@@ -2,8 +2,8 @@
 #include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
-#include "messages/playerPosition.pb.h"
-#include "messages/serverInfo.pb.h"
+#include "common/messages/playerPosition.pb.h"
+#include "common/messages/serverInfo.pb.h"
 
 namespace bomberman::scene {
 

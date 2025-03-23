@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common/Log.hpp"
-#include <iostream>
 #include <map>
 #include <stdexcept>
 

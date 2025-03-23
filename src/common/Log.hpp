@@ -3,36 +3,22 @@
 #include <cstdio>
 
 namespace bomberman::common {
-
-#ifdef ENABLE_LOGS
-#ifndef NDEBUG
-#define LOG_DBG(...)                                                           \
-  fprintf(stdout, "[DEBUG] ");                                                 \
-  fprintf(stdout, __VA_ARGS__);                                                \
-  fprintf(stdout, "\n");
-#else
-#define LOG_DBG(...)
-#endif
+void log(FILE *stream, const char *severity, const char *file, int line,
+         const char *format, ...);
+}
 
 #define LOG_INF(...)                                                           \
-  fprintf(stdout, "[*] ");                                                     \
-  fprintf(stdout, __VA_ARGS__);                                                \
-  fprintf(stdout, "\n");
-
+  bomberman::common::log(stdout, "INF", __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_WRN(...)                                                           \
-  fprintf(stderr, "[!] ");                                                     \
-  fprintf(stderr, __VA_ARGS__);                                                \
-  fprintf(stderr, "\n");
-
+  bomberman::common::log(stderr, "WRN", __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_ERR(...)                                                           \
-  fprintf(stderr, "[-] ");                                                     \
-  fprintf(stderr, __VA_ARGS__);                                                \
-  fprintf(stderr, "\n");
+  bomberman::common::log(stderr, "ERR", __FILE__, __LINE__, __VA_ARGS__)
+
+#ifndef NDEBUG
+#define LOG_DBG(...)                                                           \
+  bomberman::common::log(stdout, "DBG", __FILE__, __LINE__, __VA_ARGS__)
 #else
 #define LOG_DBG(...)
-#define LOG_INF(...)
-#define LOG_WRN(...)
-#define LOG_ERR(...)
 #endif
 
-} // namespace bomberman::common
+// namespace bomberman::common

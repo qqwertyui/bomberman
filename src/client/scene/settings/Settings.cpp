@@ -1,5 +1,5 @@
 #include "Settings.hpp"
-#include <iostream>
+#include "common/Log.hpp"
 
 namespace bomberman::scene {
 
@@ -15,7 +15,7 @@ void Settings::handleEvents() {
       if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
         change(SceneId::Menu);
       } else {
-        std::cout << "Settings key pressed!\n";
+        LOG_DBG("Settings key pressed!");
       }
     }
   }
