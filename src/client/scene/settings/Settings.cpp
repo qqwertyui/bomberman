@@ -8,12 +8,11 @@ Settings::Settings(SceneManager &sceneMgr, sf::RenderWindow &window,
     : Scene(sceneMgr, window, sceneId) {}
 
 void Settings::handleEvents() {
-  sf::Event e;
-  while (m_window.pollEvent(e)) {
-    if (e.type == sf::Event::Closed) {
+  while (const auto &e = m_window.pollEvent()) {
+    if (e->is<sf::Event::Closed>()) {
       m_window.close();
-    } else if (e.type == sf::Event::KeyPressed) {
-      if (e.key.code == sf::Keyboard::Escape) {
+    } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
+      if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
         change(SceneId::Menu);
       } else {
         std::cout << "Settings key pressed!\n";

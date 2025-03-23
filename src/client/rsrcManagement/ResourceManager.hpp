@@ -3,6 +3,7 @@
 #include "common/Log.hpp"
 #include <iostream>
 #include <map>
+#include <stdexcept>
 
 namespace bomberman::rsrcManagement {
 template <typename ResourceType, typename ResourceIdType>
@@ -20,11 +21,12 @@ public:
 
   void load(const ResourceIdType id, const std::string &path) {
     auto &rsrc{resourceMap[id]};
-    if (not rsrc.loadFromFile(path)) {
+    try {
+      rsrc = ResourceType{path};
+      LOG_INF("Loaded resource: %s", path.c_str());
+    } catch (const std::exception &) {
       LOG_ERR("Failed to load %s", path.c_str());
-      return;
     }
-    LOG_INF("Loaded resource: %s", path.c_str());
   }
 
   ResourceType &get(const ResourceIdType id) {

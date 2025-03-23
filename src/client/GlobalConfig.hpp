@@ -104,7 +104,6 @@ public:
   PARAMETER(bool, isHelp, false);
   PARAMETER(uint16_t, maxFps, 60);
   PARAMETER(std::string, assetsDir, "assets/");
-  PARAMETER(std::string, fontsDir, "C:/Windows/Fonts/Inkfree.ttf");
   PARAMETER(std::string, serverIp, "127.0.0.1");
   PARAMETER(uint16_t, serverPort, 5551);
   PARAMETER(uint16_t, windowWidth, 640);

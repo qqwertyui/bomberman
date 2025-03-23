@@ -6,10 +6,19 @@ set(
   "${CLIENT_DIR}/ConfigLoader.cpp"
 )
 
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 3.0.0
+    GIT_SHALLOW ON
+)
+FetchContent_MakeAvailable(SFML)
+
+
 include_directories(${CLIENT_DIR})
 
 add_executable(bomberman-client ${CLIENT_SOURCES})
 add_subdirectory(interface)
 add_subdirectory(scene)
 
-target_link_libraries(bomberman-client PUBLIC common messages sfml-window sfml-system sfml-graphics sfml-main)
+target_link_libraries(bomberman-client PRIVATE common messages SFML::Graphics)

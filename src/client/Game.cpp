@@ -44,10 +44,12 @@ bool Game::initialize(int argc, char **argv) {
   m_window = std::make_unique<sf::RenderWindow>(
       sf::VideoMode(sf::Vector2u(GlobalConfig::get().windowWidth(),
                                  GlobalConfig::get().windowHeight())),
-      "Snake");
+      "Bomberman");
   if (not m_window) {
+    LOG_ERR("Couldn't create window");
     return false;
   }
+
   auto &txtManager = rsrcManagement::TextureManager::instance();
   txtManager.load(rsrcManagement::TextureId::BUTTON_ACTIVE,
                   globalConfig.assetsDir() + "buttonActive.png");
@@ -55,7 +57,8 @@ bool Game::initialize(int argc, char **argv) {
                   globalConfig.assetsDir() + "buttonInactive.png");
 
   auto &fontManager = rsrcManagement::FontManager::instance();
-  fontManager.load(rsrcManagement::FontId::MENU, globalConfig.fontsDir());
+  fontManager.load(rsrcManagement::FontId::MENU,
+                   globalConfig.assetsDir() + "Inkfree.ttf");
 
   m_sceneMgr = createSceneManager(*m_window);
   return true;

@@ -12,18 +12,17 @@ Running::Running(SceneManager &sceneMgr, sf::RenderWindow &window,
     : Scene(sceneMgr, window, sceneId) {}
 
 void Running::handleEvents() {
-  sf::Event e;
-  while (m_window.pollEvent(e)) {
-    if (e.type == sf::Event::Closed) {
+  while (const auto &e = m_window.pollEvent()) {
+    if (e->is<sf::Event::Closed>()) {
       m_window.close();
-    } else if (e.type == sf::Event::KeyPressed) {
-      if (e.key.code == sf::Keyboard::Enter) {
+    } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
+      if (keyPressed->scancode == sf::Keyboard::Scancode::Enter) {
         LOG_DBG("Sending position event");
         bomberman::PlayerPosition playerPos;
         playerPos.set_positionx(x--);
         playerPos.set_positiony(y--);
         connMgr.send(playerPos);
-      } else if (e.key.code == sf::Keyboard::Escape) {
+      } else if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
         change(SceneId::Menu);
       } else {
         LOG_DBG("Running key pressed!");
