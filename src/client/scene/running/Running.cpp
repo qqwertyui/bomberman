@@ -2,8 +2,7 @@
 #include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
-#include "common/messages/playerPosition.pb.h"
-#include "common/messages/serverInfo.pb.h"
+#include "common/messages/core.pb.h"
 
 namespace bomberman::scene {
 
@@ -17,11 +16,10 @@ void Running::handleEvents() {
       m_window.close();
     } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
       if (keyPressed->scancode == sf::Keyboard::Scancode::Enter) {
-        LOG_DBG("Sending position event");
-        bomberman::PlayerPosition playerPos;
-        playerPos.set_positionx(x--);
-        playerPos.set_positiony(y--);
-        connMgr.send(playerPos);
+        LOG_DBG("Sending query");
+        bomberman::C2SMessage msg;
+        msg.mutable_query()->set_version(true);
+        connMgr.send(msg);
       } else if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
         change(SceneId::Menu);
       } else {
@@ -36,15 +34,32 @@ void Running::onEntry() {
   y = 10;
   connMgr.connect(GlobalConfig::get().serverIp(),
                   GlobalConfig::get().serverPort());
-  auto si = connMgr.receive<bomberman::ServerInfo>();
-  if (not si.has_value()) {
+
+  bomberman::C2SMessage req;
+  auto *query = req.mutable_query();
+  query->set_lobbies(true);
+  if (not connMgr.send(req)) {
     LOG_ERR("Couldn't connect to server");
     connMgr.disconnect();
     return;
   }
+
+  auto resp = connMgr.receive<bomberman::S2CMessage>();
+  if (not resp.has_value()) {
+    LOG_ERR("Couldn't connect to server");
+    connMgr.disconnect();
+    return;
+  }
+
+  if (not resp->has_query()) {
+    LOG_INF("No active lobbies");
+    return;
+  }
+
   LOG_INF("Active lobbies: ");
-  for (const auto &lobby : si.value().lobbies()) {
-    LOG_INF("id: %d | players: %d", lobby.id(), lobby.players());
+  for (const auto &lobby : resp->query().lobbies()) {
+    LOG_INF("[id: %d]: %d/%d", lobby.id(), lobby.connectedplayers(),
+            lobby.maxplayers());
   }
 }
 

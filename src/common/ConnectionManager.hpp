@@ -41,10 +41,10 @@ public:
     LOG_DBG("Disconnected");
   }
 
-  template <typename Message> void send(const Message &msg) {
+  template <typename Message> bool send(const Message &msg) {
     if (not fileDescriptor.has_value()) {
       LOG_ERR("Not connected");
-      return;
+      return false;
     }
     std::string serializedMsg;
     msg.SerializeToString(&serializedMsg);
@@ -52,15 +52,16 @@ public:
     int status = ::send(fileDescriptor.value(), (const char *)&byteSizeLong,
                         sizeof(byteSizeLong), 0);
     if (isConnectionError(status)) {
-      return;
+      return false;
     }
     status = ::send(fileDescriptor.value(), (const char *)serializedMsg.c_str(),
                     serializedMsg.size(), 0);
     if (isConnectionError(status)) {
-      return;
+      return false;
     }
     LOG_DBG("Sent message %s [%u bytes]", msg.GetTypeName().c_str(),
             byteSizeLong);
+    return true;
   }
 
   template <typename Message> std::optional<Message> receive() {
@@ -68,14 +69,18 @@ public:
       LOG_ERR("Not connected");
       return std::nullopt;
     }
-    Message msg;
     unsigned int byteSizeLong;
+    auto bytesReceived = recv(fileDescriptor.value(), (char *)&byteSizeLong,
+                              sizeof(byteSizeLong), MSG_WAITALL);
+    if (bytesReceived == 0) {
+      return std::nullopt;
+    }
+
+    Message msg;
     std::string serializedMsg;
-    ::recv(fileDescriptor.value(), (char *)&byteSizeLong, sizeof(byteSizeLong),
-           MSG_WAITALL);
     serializedMsg.resize(byteSizeLong);
-    ::recv(fileDescriptor.value(), (char *)serializedMsg.c_str(), byteSizeLong,
-           MSG_WAITALL);
+    recv(fileDescriptor.value(), (char *)serializedMsg.c_str(), byteSizeLong,
+         MSG_WAITALL);
     msg.ParseFromString(serializedMsg);
     LOG_DBG("Received message %s [%u bytes]", msg.GetTypeName().c_str(),
             byteSizeLong);

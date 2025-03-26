@@ -1,9 +1,9 @@
 #include "ConfigLoader.hpp"
+#include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
 #include "common/Networking.hpp"
-#include "common/messages/playerPosition.pb.h"
-#include "common/messages/serverInfo.pb.h"
+#include "common/messages/core.pb.h"
 
 #include <thread>
 #include <unistd.h>
@@ -14,27 +14,54 @@ struct ClientInfo {
   unsigned int port;
 };
 
+void handleQuery(const bomberman::QueryReq &req, bomberman::QueryResp &resp) {
+  if (req.has_version()) {
+    resp.set_version(bomberman::GlobalConfig::get().version());
+  }
+  if (req.has_lobbies()) {
+    for (int i = 0; i < bomberman::GlobalConfig::get().numberOfLobbies(); i++) {
+      auto *lobby = resp.add_lobbies();
+      lobby->set_id(i);
+      lobby->set_connectedplayers(0);
+      lobby->set_maxplayers(bomberman::GlobalConfig::get().maxLobbySize());
+    }
+  }
+}
+
+void handleUpdate(const bomberman::UpdateReq &req,
+                  bomberman::UpdateResp &resp) {
+  if (req.has_lobby()) {
+    //
+  }
+  if (req.has_game()) {
+    //
+  }
+}
+
+bool handleMessage(const bomberman::C2SMessage &req,
+                   bomberman::S2CMessage &resp) {
+  if (req.has_query()) {
+    handleQuery(req.query(), *resp.mutable_query());
+  }
+  if (req.has_update()) {
+    handleUpdate(req.update(), *resp.mutable_update());
+  }
+
+  return true;
+}
+
 void handleClient(const ClientInfo clientInfo) {
   LOG_INF("[+] Connected from %s:%u", clientInfo.ip.c_str(), clientInfo.port);
 
-  bomberman::ServerInfo si;
-  si.set_version("0.1");
-  bomberman::ServerInfo::Lobby *lobby1 = si.add_lobbies();
-  lobby1->set_id(1);
-  lobby1->set_players(0);
-  bomberman::ServerInfo::Lobby *lobby2 = si.add_lobbies();
-  lobby2->set_id(2);
-  lobby2->set_players(0);
-
   bomberman::common::ConnectionManager connMgr{clientInfo.fd};
-  connMgr.send(si);
 
-  bomberman::PlayerPosition playerPos{};
-  do {
-    playerPos = connMgr.receive<bomberman::PlayerPosition>().value();
-    LOG_INF("User %s:%u position: [x=%d, y=%d]", clientInfo.ip.c_str(),
-            clientInfo.port, playerPos.positionx(), playerPos.positiony());
-  } while (playerPos.positionx() != 0 or playerPos.positiony() != 0);
+  while (auto req = connMgr.receive<bomberman::C2SMessage>()) {
+    bomberman::S2CMessage resp;
+    if (not handleMessage(req.value(), resp)) {
+      break;
+    }
+    connMgr.send(resp);
+  }
 
   shutdown(clientInfo.fd, SHUT_RDWR);
   close(clientInfo.fd);
@@ -57,6 +84,13 @@ int main(int argc, char **argv) {
     LOG_ERR("Socket creation failed: %s", strerror(errno));
     return 1;
   }
+  int option{1};
+  if (setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) <
+      0) {
+    LOG_ERR("setsockopt failed: %s", strerror(errno));
+    return 1;
+  }
+
   struct sockaddr_in server_sin;
   server_sin.sin_family = AF_INET;
   server_sin.sin_port = htons(config.port);
