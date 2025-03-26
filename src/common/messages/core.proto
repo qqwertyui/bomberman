@@ -1,0 +1,21 @@
+syntax = "proto2";
+package bomberman;
+
+import "query.proto";
+import "update.proto";
+
+
+/*
+  C2S -> client to server
+  S2C -> server to client
+*/
+message C2SMessage {
+  optional QueryReq query = 1;
+  optional UpdateReq update = 2;
+}
+
+message S2CMessage {
+  optional QueryResp query = 1;
+  optional UpdateResp update = 2;
+  optional UpdateInd ind = 3;
+}

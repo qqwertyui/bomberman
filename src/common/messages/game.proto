@@ -1,0 +1,18 @@
+syntax = "proto2";
+package bomberman;
+
+
+message Position {
+  required int32 x = 1;
+  required int32 y = 2;
+}
+
+message UpdateGameReq {
+  optional bool bombPlanted = 1;
+  optional Position position = 2;
+}
+
+message UpdateGameResp {
+  optional bool isBombOk = 1;
+  optional bool isPositionOk = 2;
+}

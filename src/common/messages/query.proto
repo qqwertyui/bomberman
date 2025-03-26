@@ -1,0 +1,19 @@
+syntax = "proto2";
+package bomberman;
+
+
+message Lobby {
+  required int32 id = 1;
+  required int32 connectedPlayers = 2;
+  required int32 maxPlayers = 3;
+}
+
+message QueryReq {
+  optional bool version = 1;
+  optional bool lobbies = 2;
+}
+
+message QueryResp {
+  optional int32 version = 1;
+  repeated Lobby lobbies = 2;
+}

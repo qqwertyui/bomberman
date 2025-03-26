@@ -1,0 +1,28 @@
+syntax = "proto2";
+package bomberman;
+
+import "lobby.proto";
+import "game.proto";
+
+
+message UpdateReq {
+  optional UpdateLobbyReq lobby = 1;
+  optional UpdateGameReq game = 2;
+}
+
+message UpdateResp {
+  optional UpdateLobbyResp lobby = 1;
+  optional UpdateGameResp game = 2;
+}
+
+message UpdateInd {
+  message GameStateModification {
+    enum State {
+      STARTED = 0;
+      FINISHED = 1;
+    }
+  }
+
+  optional GameStateModification gameState = 1;
+  optional bool dead = 2;
+}
