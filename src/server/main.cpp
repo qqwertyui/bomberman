@@ -1,4 +1,3 @@
-#include "ConfigLoader.hpp"
 #include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
@@ -71,9 +70,9 @@ void handleClient(const ClientInfo clientInfo) {
 
 int main(int argc, char **argv) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  bomberman::ConfigLoader configLoader{argc, argv};
-  const auto &config{configLoader.get()};
+  if (not bomberman::GlobalConfig::load(argc, argv)) {
+    return 1;
+  }
 
   if (not initNetworking()) {
     LOG_ERR("Networking initialization failed");
@@ -91,10 +90,11 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  const auto &config{bomberman::GlobalConfig::get()};
   struct sockaddr_in server_sin;
   server_sin.sin_family = AF_INET;
-  server_sin.sin_port = htons(config.port);
-  server_sin.sin_addr.s_addr = inet_addr(config.bindIp.c_str());
+  server_sin.sin_port = htons(config.port());
+  server_sin.sin_addr.s_addr = inet_addr(config.bindIp().c_str());
 
   int status = bind(serverFd, (const struct sockaddr *)&server_sin,
                     sizeof(struct sockaddr_in));
@@ -102,13 +102,13 @@ int main(int argc, char **argv) {
     LOG_ERR("Bind failed: %s", strerror(errno));
     return 1;
   }
-  status = listen(serverFd, config.backlogSize);
+  status = listen(serverFd, config.backlogSize());
   if (status == -1) {
     LOG_ERR("Listen failed: %s", strerror(errno));
     return 1;
   }
-  LOG_INF("Listening for incoming connections on %s:%u", config.bindIp.c_str(),
-          config.port);
+  LOG_INF("Listening for incoming connections on %s:%u",
+          config.bindIp().c_str(), config.port());
   while (1) {
     struct sockaddr_in client_sin;
     socklen_t socklen = sizeof(client_sin);
@@ -122,5 +122,7 @@ int main(int argc, char **argv) {
     std::thread clientThread(handleClient, clientInfo);
     clientThread.detach();
   }
+
+  close(serverFd);
   return 0;
 }

@@ -3,25 +3,14 @@
 #include "common/GlobalConfigBase.hpp"
 
 namespace bomberman {
-class GlobalConfig : public GlobalConfigBase {
-public:
-  using GlobalConfigBase::GlobalConfigBase;
-
-  inline static GlobalConfig &get() {
-    static GlobalConfig globalConfig;
-    return globalConfig;
-  }
-
-  PARAMETER(bool, isHelp, false);
+struct Params {
   PARAMETER(uint16_t, maxFps, 60);
   PARAMETER(std::string, assetsDir, "assets/");
   PARAMETER(std::string, serverIp, "127.0.0.1");
   PARAMETER(uint16_t, serverPort, 5551);
   PARAMETER(uint16_t, windowWidth, 640);
   PARAMETER(uint16_t, windowHeight, 480);
-
-private:
-  GlobalConfig() = default;
 };
+using GlobalConfig = GlobalConfigBase<Params>;
 
 } // namespace bomberman
