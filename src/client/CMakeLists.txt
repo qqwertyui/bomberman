@@ -3,7 +3,6 @@ set(
   CLIENT_SOURCES
   "${CLIENT_DIR}/main.cpp"
   "${CLIENT_DIR}/Game.cpp"
-  "${CLIENT_DIR}/ConfigLoader.cpp"
 )
 
 include(FetchContent)

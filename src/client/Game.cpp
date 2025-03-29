@@ -1,5 +1,5 @@
 #include "Game.hpp"
-#include "ConfigLoader.hpp"
+#include "GlobalConfig.hpp"
 #include "common/Log.hpp"
 #include "rsrcManagement/FontManager.hpp"
 #include "rsrcManagement/TextureManager.hpp"
@@ -27,23 +27,16 @@ Game::createSceneManager(sf::RenderWindow &window) {
 }
 
 bool Game::initialize(int argc, char **argv) {
-  ConfigLoader::loadConfig(argc, argv);
-  auto &globalConfig{GlobalConfig::get()};
-  if (globalConfig.isHelp()) {
-    LOG_INF("Possible parameters are [%s]",
-            globalConfig.getRegisteredNames().c_str());
+  if (not GlobalConfig::load(argc, argv)) {
     return false;
   }
-  LOG_INF("Loaded configuration: [%s]", globalConfig.asString().c_str());
-
   if (not initNetworking()) {
     LOG_ERR("Networking initialization failed");
     return false;
   }
-
+  auto &config{GlobalConfig::get()};
   m_window = std::make_unique<sf::RenderWindow>(
-      sf::VideoMode(sf::Vector2u(GlobalConfig::get().windowWidth(),
-                                 GlobalConfig::get().windowHeight())),
+      sf::VideoMode(sf::Vector2u(config.windowWidth(), config.windowHeight())),
       "Bomberman");
   if (not m_window) {
     LOG_ERR("Couldn't create window");
@@ -52,20 +45,19 @@ bool Game::initialize(int argc, char **argv) {
 
   auto &txtManager = rsrcManagement::TextureManager::instance();
   txtManager.load(rsrcManagement::TextureId::BUTTON_ACTIVE,
-                  globalConfig.assetsDir() + "buttonActive.png");
+                  config.assetsDir() + "buttonActive.png");
   txtManager.load(rsrcManagement::TextureId::BUTTON_INACTIVE,
-                  globalConfig.assetsDir() + "buttonInactive.png");
+                  config.assetsDir() + "buttonInactive.png");
 
   auto &fontManager = rsrcManagement::FontManager::instance();
   fontManager.load(rsrcManagement::FontId::MENU,
-                   globalConfig.assetsDir() + "Inkfree.ttf");
+                   config.assetsDir() + "Inkfree.ttf");
 
   m_sceneMgr = createSceneManager(*m_window);
   return true;
 }
 
 int Game::run(int argc, char **argv) {
-  LOG_DBG("Debug mode enabled");
   if (not initialize(argc, argv)) {
     LOG_ERR("Initalization failed");
     return 1;

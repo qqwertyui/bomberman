@@ -59,8 +59,8 @@ public:
     if (isConnectionError(status)) {
       return false;
     }
-    LOG_DBG("Sent message %s [%u bytes]", msg.GetTypeName().c_str(),
-            byteSizeLong);
+    LOG_DBG("[send] msg:%s, size:%u, body:%s", msg.GetTypeName().c_str(),
+            byteSizeLong, msg.DebugString().c_str());
     return true;
   }
 
@@ -82,8 +82,8 @@ public:
     recv(fileDescriptor.value(), (char *)serializedMsg.c_str(), byteSizeLong,
          MSG_WAITALL);
     msg.ParseFromString(serializedMsg);
-    LOG_DBG("Received message %s [%u bytes]", msg.GetTypeName().c_str(),
-            byteSizeLong);
+    LOG_DBG("[recv] msg:%s, size:%u, body:%s", msg.GetTypeName().c_str(),
+            byteSizeLong, msg.DebugString().c_str());
     return msg;
   }
 

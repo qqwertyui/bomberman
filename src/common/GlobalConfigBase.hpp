@@ -1,13 +1,16 @@
 #pragma once
 
+#include <cassert>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <vector>
 
-namespace bomberman {
-class ConfigLoader;
+#include "ArgumentParser.hpp"
+#include "Log.hpp"
 
+namespace bomberman {
 // integral types
 template <typename T, std::enable_if_t<std::is_integral<T>::value &&
                                            not std::is_same<T, bool>::value,
@@ -48,20 +51,26 @@ inline std::string toString(const T &value) {
 
 class ParameterBase {
 public:
+  ParameterBase() { instances.push_back(this); }
+
   virtual std::string asString() const = 0;
   virtual std::string getName() const = 0;
   virtual void loadFromString(const std::string &newValue) = 0;
+
+  static const std::vector<ParameterBase *> getInstances() { return instances; }
+
+private:
+  inline static std::vector<ParameterBase *> instances;
 };
 
 #define PARAMETER(type, name, value)                                           \
   class class_##name : public ParameterBase {                                  \
   public:                                                                      \
-    class_##name() { GlobalConfig::parameters.push_back(this); }               \
     std::string asString() const override {                                    \
       return #name + std::string("=") + toString<type>(m_value);               \
     }                                                                          \
     std::string getName() const override { return #name; }                     \
-    type &operator()() { return m_value; }                                     \
+    const type &operator()() const { return m_value; }                         \
     void loadFromString(const std::string &newValue) override {                \
       m_value = fromString<type>(newValue);                                    \
     }                                                                          \
@@ -70,38 +79,77 @@ public:
     type m_value{value};                                                       \
   } name;
 
-class GlobalConfigBase {
+template <typename Params> class GlobalConfigBase : public Params {
 public:
   GlobalConfigBase(const GlobalConfigBase &) = delete;
   GlobalConfigBase(const GlobalConfigBase &&) = delete;
   GlobalConfigBase &operator=(const GlobalConfigBase &) = delete;
   GlobalConfigBase &operator=(const GlobalConfigBase &&) = delete;
 
+  ~GlobalConfigBase() {
+    if (instance) {
+      delete instance;
+    }
+  }
+
+  inline static bool load(int argc, char **argv) {
+    instance = new GlobalConfigBase<Params>(argc, argv);
+    return instance->good();
+  }
+
+  inline static GlobalConfigBase &get() {
+    assert(instance != nullptr);
+    return *instance;
+  }
+
+private:
+  GlobalConfigBase(int argc, char **argv) {
+    auto cmdLineArgs = common::ArgumentParser::parse(argc, argv);
+
+    for (const auto &[param, value] : cmdLineArgs) {
+      if (param == "help") {
+        LOG_INF("Possible arguments: %s", asString().c_str());
+        return;
+      }
+      bool found{false};
+      for (auto &parameter : ParameterBase::getInstances()) {
+        if (parameter->getName() != param) {
+          continue;
+        }
+        parameter->loadFromString(value);
+        found = true;
+      }
+      if (not found) {
+        LOG_WRN("Invalid argument: %s", param.c_str());
+        return;
+      }
+    }
+    LOG_DBG("Loaded configuration: [%s]", asString().c_str());
+    initialized = true;
+  }
+
+  bool good() const { return initialized; }
+
   inline std::string asString() {
     std::string result;
-    for (auto &parameter : parameters) {
+    for (const auto &parameter : ParameterBase::getInstances()) {
       result += parameter->asString() + ",";
     }
     result.pop_back();
     return result;
   }
+
   inline std::string getRegisteredNames() {
     std::string result;
-    for (auto &parameter : parameters) {
+    for (const auto &parameter : ParameterBase::getInstances()) {
       result += parameter->getName() + ",";
     }
     result.pop_back();
     return result;
   }
-  inline const std::vector<ParameterBase *> &getRegisteredParameters() {
-    return parameters;
-  }
+  bool initialized{false};
 
-protected:
-  GlobalConfigBase() = default;
-
-  static inline std::vector<ParameterBase *> parameters;
-  friend class ConfigLoader;
+  inline static GlobalConfigBase *instance;
 };
 
 } // namespace bomberman
