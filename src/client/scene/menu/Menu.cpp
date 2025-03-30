@@ -1,6 +1,5 @@
 #include "Menu.hpp"
-#include "rsrcManagement/TextureManager.hpp"
-#include <iostream>
+#include "resource/TextureManager.hpp"
 
 namespace bm::scene {
 
