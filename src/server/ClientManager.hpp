@@ -1,15 +1,16 @@
 #pragma once
 
-#include "Client.hpp"
+namespace bm::common {
+struct ConnectionInfo;
+}
 
 namespace bm {
-
 class ClientManager {
 public:
   static void run();
 
 private:
-  static void handleNewConnection(const Client::Info &info);
+  static void handleNewConnection(const common::ConnectionInfo &info);
 };
 
 } // namespace bm
