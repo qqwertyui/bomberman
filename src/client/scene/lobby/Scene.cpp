@@ -1,15 +1,15 @@
-#include "Running.hpp"
+#include "Scene.hpp"
 #include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
 #include "common/itf/core.pb.h"
 
-namespace bm::scene {
-Running::Running(SceneManager &sceneMgr, sf::RenderWindow &window,
-                 const SceneId &sceneId)
-    : Scene(sceneMgr, window, sceneId) {}
+namespace bm::scene::lobby {
+Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
+             const SceneId &sceneId)
+    : SceneBase(sceneMgr, window, sceneId) {}
 
-void Running::handleEvents() {
+void Scene::handleEvents() {
   while (const auto &e = m_window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
       m_window.close();
@@ -28,7 +28,7 @@ void Running::handleEvents() {
   }
 }
 
-void Running::onEntry() {
+void Scene::onEntry() {
   x = 10;
   y = 10;
   connMgr.connect(GlobalConfig::get().serverIp(),
@@ -62,13 +62,13 @@ void Running::onEntry() {
   }
 }
 
-void Running::onLeave() { connMgr.disconnect(); }
+void Scene::onLeave() { connMgr.disconnect(); }
 
-void Running::update() {}
+void Scene::update() {}
 
-void Running::draw() {
+void Scene::draw() {
   m_window.clear(sf::Color::Blue);
   m_window.display();
 }
 
-} // namespace bm::scene
+} // namespace bm::scene::lobby

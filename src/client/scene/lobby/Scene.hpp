@@ -1,13 +1,13 @@
 #pragma once
 
 #include "common/ConnectionManager.hpp"
-#include "scene/Scene.hpp"
+#include "scene/SceneBase.hpp"
 
-namespace bm::scene {
-class Running : public Scene {
+namespace bm::scene::lobby {
+class Scene : public SceneBase {
 public:
-  Running(SceneManager &sceneMgr, sf::RenderWindow &window,
-          const SceneId &sceneId);
+  Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
+        const SceneId &sceneId);
 
   void handleEvents() override;
   void update() override;
@@ -20,4 +20,4 @@ private:
   int x, y;
 };
 
-} // namespace bm::scene
+} // namespace bm::scene::lobby

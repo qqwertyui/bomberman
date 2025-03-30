@@ -1,14 +1,14 @@
 #pragma once
 
 #include "interface/Button.hpp"
-#include "scene/Scene.hpp"
+#include "scene/SceneBase.hpp"
 #include <map>
 
-namespace bm::scene {
-class Menu : public Scene {
+namespace bm::scene::menu {
+class Scene : public SceneBase {
 public:
-  Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
-       const SceneId &sceneId);
+  Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
+        const SceneId &sceneId);
 
   void handleEvents() override;
   void update() override;
@@ -21,4 +21,5 @@ private:
   ButtonId m_activeButton{ButtonId::Start};
   std::map<ButtonId, interface::Button> buttons;
 };
-} // namespace bm::scene
+
+} // namespace bm::scene::menu

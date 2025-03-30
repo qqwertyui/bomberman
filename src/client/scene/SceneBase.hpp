@@ -5,20 +5,14 @@
 namespace bm::scene {
 class SceneManager;
 
-enum class SceneId : unsigned int {
-  Menu,
-  Settings,
-  Pause,
-  Running,
-  NumberOfScenes
-};
+enum class SceneId : unsigned int { Menu, Settings, Pause, Lobby, Game };
 
-class Scene {
+class SceneBase {
 public:
-  Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
-        const SceneId &sceneId)
+  SceneBase(SceneManager &sceneMgr, sf::RenderWindow &window,
+            const SceneId &sceneId)
       : m_sceneMgr(sceneMgr), m_window(window), m_sceneId(sceneId) {}
-  ~Scene() = default;
+  ~SceneBase() = default;
 
   virtual void handleEvents() = 0;
   virtual void update() = 0;
