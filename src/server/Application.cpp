@@ -7,7 +7,6 @@
 #include "common/Networking.hpp"
 
 #include <google/protobuf/stubs/common.h>
-#include <thread>
 
 namespace bm {
 bool Application::initialize(int argc, char **argv) {
@@ -35,10 +34,7 @@ int Application::run(int argc, char **argv) {
   if (not createDatabase()) {
     return 2;
   }
-  std::thread{ClientManager::run}.detach();
-
-  while (true) {
-  }
+  ClientManager::run();
   return 0;
 }
 
