@@ -1,7 +1,9 @@
 #pragma once
 
-#include "common/Log.hpp"
-#include "common/Networking.hpp"
+#include "ConnectionInfo.hpp"
+#include "Log.hpp"
+#include "Networking.hpp"
+
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -10,11 +12,13 @@ namespace bm::common {
 class ConnectionManager {
 public:
   ConnectionManager() = default;
-  ConnectionManager(int fileDescriptor) : fileDescriptor(fileDescriptor) {}
+  ConnectionManager(const ConnectionInfo &info) : info(info) {}
+
+  bool isConnected() const { return info.has_value(); }
 
   void connect(const std::string &ip, const uint16_t port) {
-    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_fd == -1) {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd == -1) {
       LOG_ERR("Socket creation failed: %s", strerror(errno));
       return;
     }
@@ -23,38 +27,40 @@ public:
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
 
-    if (::connect(socket_fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
+    if (::connect(fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
       LOG_ERR("Couldn't connect to %s:%u", ip.c_str(), port);
       return;
     }
-    fileDescriptor = socket_fd;
-    LOG_DBG("Connected");
+
+    info =
+        ConnectionInfo{fd, inet_ntoa(server.sin_addr), htons(server.sin_port)};
+    LOG_DBG("Connected to %s:%u", info->ip.c_str(), info->port);
   }
 
   void disconnect() {
-    if (not fileDescriptor.has_value()) {
+    if (not isConnected()) {
       LOG_WRN("Connection already closed");
       return;
     }
-    ::closeConnection(fileDescriptor.value());
-    fileDescriptor.reset();
-    LOG_DBG("Disconnected");
+    ::closeConnection(info->fd);
+    LOG_DBG("Disconnected from %s:%u", info->ip.c_str(), info->port);
+    info.reset();
   }
 
   template <typename Message> bool send(const Message &msg) {
-    if (not fileDescriptor.has_value()) {
+    if (not isConnected()) {
       LOG_ERR("Not connected");
       return false;
     }
     std::string serializedMsg;
     msg.SerializeToString(&serializedMsg);
     unsigned int byteSizeLong = msg.ByteSizeLong();
-    int status = ::send(fileDescriptor.value(), (const char *)&byteSizeLong,
-                        sizeof(byteSizeLong), 0);
+    int status =
+        ::send(info->fd, (const char *)&byteSizeLong, sizeof(byteSizeLong), 0);
     if (isConnectionError(status)) {
       return false;
     }
-    status = ::send(fileDescriptor.value(), (const char *)serializedMsg.c_str(),
+    status = ::send(info->fd, (const char *)serializedMsg.c_str(),
                     serializedMsg.size(), 0);
     if (isConnectionError(status)) {
       return false;
@@ -65,12 +71,12 @@ public:
   }
 
   template <typename Message> std::optional<Message> receive() {
-    if (not fileDescriptor.has_value()) {
+    if (not isConnected()) {
       LOG_ERR("Not connected");
       return std::nullopt;
     }
     unsigned int byteSizeLong;
-    auto bytesReceived = recv(fileDescriptor.value(), (char *)&byteSizeLong,
+    auto bytesReceived = recv(info->fd, (char *)&byteSizeLong,
                               sizeof(byteSizeLong), MSG_WAITALL);
     if (bytesReceived == 0) {
       return std::nullopt;
@@ -79,8 +85,7 @@ public:
     Message msg;
     std::string serializedMsg;
     serializedMsg.resize(byteSizeLong);
-    recv(fileDescriptor.value(), (char *)serializedMsg.c_str(), byteSizeLong,
-         MSG_WAITALL);
+    recv(info->fd, (char *)serializedMsg.c_str(), byteSizeLong, MSG_WAITALL);
     msg.ParseFromString(serializedMsg);
     LOG_DBG("[recv] msg:%s, size:%u, body:%s", msg.GetTypeName().c_str(),
             byteSizeLong, msg.DebugString().c_str());
@@ -97,6 +102,6 @@ public:
   }
 
 private:
-  std::optional<int> fileDescriptor;
+  std::optional<ConnectionInfo> info;
 };
 } // namespace bm::common

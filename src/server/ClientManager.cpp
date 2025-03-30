@@ -1,5 +1,6 @@
 #include "ClientManager.hpp"
 
+#include "Client.hpp"
 #include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
@@ -7,7 +8,6 @@
 #include "common/messages/core.pb.h"
 #include <optional>
 #include <thread>
-#include <unistd.h>
 
 namespace bm {
 std::optional<int> setupSocket() {
@@ -36,15 +36,15 @@ std::optional<int> setupSocket() {
   return fd;
 }
 
-std::optional<Client::Info> accept(int fd) {
+std::optional<common::ConnectionInfo> accept(int fd) {
   struct sockaddr_in client_sin;
   socklen_t socklen = sizeof(client_sin);
   int clientFd = accept(fd, (struct sockaddr *)&client_sin, &socklen);
   if (clientFd == -1) {
     return std::nullopt;
   }
-  Client::Info info{clientFd, inet_ntoa(client_sin.sin_addr),
-                    htons(client_sin.sin_port)};
+  common::ConnectionInfo info{clientFd, inet_ntoa(client_sin.sin_addr),
+                              htons(client_sin.sin_port)};
   return info;
 }
 
@@ -68,9 +68,9 @@ void ClientManager::run() {
   close(*fd);
 }
 
-void ClientManager::handleNewConnection(const Client::Info &info) {
-  Client client{info};
-  common::ConnectionManager connMgr{info.fd};
+void ClientManager::handleNewConnection(const common::ConnectionInfo &info) {
+  Client client{};
+  common::ConnectionManager connMgr{info};
   client.onConnect();
 
   while (auto req = connMgr.receive<C2SMessage>()) {
@@ -81,8 +81,7 @@ void ClientManager::handleNewConnection(const Client::Info &info) {
     connMgr.send(resp.value());
   }
 
-  shutdown(info.fd, SHUT_RDWR);
-  close(info.fd);
+  connMgr.disconnect();
   client.onDisconnect();
 }
 

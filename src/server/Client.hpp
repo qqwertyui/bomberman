@@ -9,20 +9,11 @@ class C2SMessage;
 
 class Client {
 public:
-  struct Info {
-    int fd;
-    std::string ip;
-    unsigned int port;
-  };
-
-  Client(const Info &info);
+  Client() = default;
 
   void onConnect();
   std::optional<S2CMessage> onReceive(const C2SMessage &req);
   void onDisconnect();
-
-private:
-  Info info;
 };
 
 } // namespace bm

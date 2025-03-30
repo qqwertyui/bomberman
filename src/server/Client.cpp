@@ -5,8 +5,6 @@
 #include "common/messages/core.pb.h"
 
 namespace bm {
-Client::Client(const Client::Info &info) : info{info} {}
-
 void handleQuery(const QueryReq &req, QueryResp &resp) {
   if (req.has_version()) {
     resp.set_version(GlobalConfig::get().version());
@@ -39,9 +37,7 @@ bool handleMessage(const C2SMessage &req, S2CMessage &resp) {
   return true;
 }
 
-void Client::onConnect() {
-  LOG_INF("[+] Connected from %s:%u", info.ip.c_str(), info.port);
-}
+void Client::onConnect() {}
 
 std::optional<S2CMessage> Client::onReceive(const C2SMessage &req) {
   S2CMessage resp;
@@ -51,8 +47,6 @@ std::optional<S2CMessage> Client::onReceive(const C2SMessage &req) {
   return resp;
 }
 
-void Client::onDisconnect() {
-  LOG_INF("[-] Disconnected from %s:%u", info.ip.c_str(), info.port);
-}
+void Client::onDisconnect() {}
 
 } // namespace bm
