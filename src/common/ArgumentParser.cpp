@@ -1,6 +1,14 @@
 #include "ArgumentParser.hpp"
+#include <string_view>
 
 namespace bomberman::common {
+static constexpr std::string_view prefix{"--"};
+
+bool isValidPrefix(const std::string &arg) {
+  return (arg.size() >= prefix.size() and
+          arg.substr(0, prefix.size()) == prefix);
+}
+
 ArgumentParser::ArgumentMap ArgumentParser::parse(int argc, char **argv) {
   std::vector<std::string> args{};
   for (int i = 1; i < argc; i++) {
@@ -12,27 +20,31 @@ ArgumentParser::ArgumentMap ArgumentParser::parse(int argc, char **argv) {
 ArgumentParser::ArgumentMap
 ArgumentParser::parse(const std::vector<std::string> &args) {
   ArgumentParser::ArgumentMap result;
-  for (const std::string arg : args) {
-    std::string first, second;
-    size_t firstArgOffset{0};
-    if (arg[0] == '-')
-      firstArgOffset++;
-    if (arg.size() > 1 and arg[1] == '-')
-      firstArgOffset++;
-    if (firstArgOffset == arg.size()) {
+  if (args.size() < 1) {
+    return {};
+  }
+
+  for (unsigned int i = 0; i < args.size();) {
+    const auto &arg1{args[i]};
+    if (not isValidPrefix(arg1)) {
+      i++;
       continue;
     }
-    auto secondArgOffset = arg.find('=');
-    if (secondArgOffset != std::string::npos) {
-      if ((secondArgOffset + 1) < arg.size()) {
-        second = arg.substr(secondArgOffset + 1);
+    const auto &name{arg1.substr(prefix.size())};
+    std::string value{""};
+
+    int elements{1};
+    if (i < (args.size() - 1)) {
+      const auto &arg2{args[i + 1]};
+
+      if (not isValidPrefix(arg2)) {
+        value = arg2;
+        elements = 2;
       }
     }
-    size_t elements = (secondArgOffset == std::string::npos)
-                          ? secondArgOffset
-                          : secondArgOffset - firstArgOffset;
-    first = arg.substr(firstArgOffset, elements);
-    result[first] = second;
+
+    result[name] = value;
+    i += elements;
   }
   return result;
 }
