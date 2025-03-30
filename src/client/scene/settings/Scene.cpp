@@ -1,12 +1,12 @@
-#include "Settings.hpp"
+#include "Scene.hpp"
 #include "common/Log.hpp"
 
-namespace bm::scene {
-Settings::Settings(SceneManager &sceneMgr, sf::RenderWindow &window,
-                   const SceneId &sceneId)
-    : Scene(sceneMgr, window, sceneId) {}
+namespace bm::scene::settings {
+Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
+             const SceneId &sceneId)
+    : SceneBase(sceneMgr, window, sceneId) {}
 
-void Settings::handleEvents() {
+void Scene::handleEvents() {
   while (const auto &e = m_window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
       m_window.close();
@@ -20,11 +20,11 @@ void Settings::handleEvents() {
   }
 }
 
-void Settings::update() {}
+void Scene::update() {}
 
-void Settings::draw() {
+void Scene::draw() {
   m_window.clear(sf::Color::Green);
   m_window.display();
 }
 
-} // namespace bm::scene
+} // namespace bm::scene::settings

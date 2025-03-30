@@ -3,16 +3,16 @@
 #include <algorithm>
 
 namespace bm::scene {
-SceneManager::SceneManager(std::list<std::unique_ptr<Scene>> &&scenes)
+SceneManager::SceneManager(std::list<std::unique_ptr<SceneBase>> &&scenes)
     : scenes(std::move(scenes)) {}
 
-void SceneManager::add(std::unique_ptr<Scene> &&scene) {
+void SceneManager::add(std::unique_ptr<SceneBase> &&scene) {
   scenes.emplace_back(std::move(scene));
 }
 
 void SceneManager::remove(const SceneId &sceneId) {
   auto it = std::find_if(scenes.begin(), scenes.end(),
-                         [&sceneId](std::unique_ptr<Scene> &scene) {
+                         [&sceneId](std::unique_ptr<SceneBase> &scene) {
                            return scene->getId() == sceneId;
                          });
   if (it != scenes.end()) {
@@ -21,7 +21,7 @@ void SceneManager::remove(const SceneId &sceneId) {
 }
 
 void SceneManager::change(const SceneId &sceneId) {
-  Scene *scene = getSceneById(sceneId);
+  auto *scene = getSceneById(sceneId);
   if (scene == nullptr) {
     LOG_WRN("Failed to switch to SceneId=%u",
             static_cast<unsigned int>(sceneId));
@@ -36,9 +36,9 @@ void SceneManager::change(const SceneId &sceneId) {
   }
 }
 
-Scene *SceneManager::getSceneById(const SceneId &sceneId) {
+SceneBase *SceneManager::getSceneById(const SceneId &sceneId) {
   auto it = std::find_if(scenes.begin(), scenes.end(),
-                         [&sceneId](std::unique_ptr<Scene> &scene) {
+                         [&sceneId](std::unique_ptr<SceneBase> &scene) {
                            return scene->getId() == sceneId;
                          });
   if (it != scenes.end()) {
@@ -47,6 +47,6 @@ Scene *SceneManager::getSceneById(const SceneId &sceneId) {
   return nullptr;
 }
 
-Scene &SceneManager::getActive() { return *activeScene; }
+SceneBase &SceneManager::getActive() { return *activeScene; }
 
 } // namespace bm::scene

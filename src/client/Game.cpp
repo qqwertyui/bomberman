@@ -3,23 +3,23 @@
 #include "common/Log.hpp"
 #include "resource/FontManager.hpp"
 #include "resource/TextureManager.hpp"
-#include "scene/menu/Menu.hpp"
-#include "scene/running/Running.hpp"
-#include "scene/settings/Settings.hpp"
+#include "scene/lobby/Scene.hpp"
+#include "scene/menu/Scene.hpp"
+#include "scene/settings/Scene.hpp"
 
 namespace bm {
 std::unique_ptr<scene::SceneManager>
 Game::createSceneManager(sf::RenderWindow &window) {
   auto sceneMgr = std::make_unique<scene::SceneManager>();
-  auto menu =
-      std::make_unique<scene::Menu>(*sceneMgr, window, scene::SceneId::Menu);
-  auto running = std::make_unique<scene::Running>(*sceneMgr, window,
-                                                  scene::SceneId::Running);
-  auto settings = std::make_unique<scene::Settings>(*sceneMgr, window,
-                                                    scene::SceneId::Settings);
+  auto menu = std::make_unique<scene::menu::Scene>(*sceneMgr, window,
+                                                   scene::SceneId::Menu);
+  auto lobby = std::make_unique<scene::lobby::Scene>(*sceneMgr, window,
+                                                     scene::SceneId::Lobby);
+  auto settings = std::make_unique<scene::settings::Scene>(
+      *sceneMgr, window, scene::SceneId::Settings);
 
   sceneMgr->add(std::move(menu));
-  sceneMgr->add(std::move(running));
+  sceneMgr->add(std::move(lobby));
   sceneMgr->add(std::move(settings));
   sceneMgr->change(scene::SceneId::Menu);
   return sceneMgr;

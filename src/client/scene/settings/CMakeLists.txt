@@ -1,7 +1,7 @@
 set(SCENE_SETTINGS_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(
   SCENE_SETTINGS_SOURCES
-  "${SCENE_SETTINGS_DIR}/Settings.cpp"
+  "${SCENE_SETTINGS_DIR}/Scene.cpp"
 )
 
 target_sources(bomberman-client PUBLIC ${SCENE_SETTINGS_SOURCES})

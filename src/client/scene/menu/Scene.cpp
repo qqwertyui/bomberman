@@ -1,11 +1,10 @@
-#include "Menu.hpp"
+#include "Scene.hpp"
 #include "resource/TextureManager.hpp"
 
-namespace bm::scene {
-
-Menu::Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
-           const SceneId &sceneId)
-    : Scene(sceneMgr, window, sceneId) {
+namespace bm::scene::menu {
+Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
+             const SceneId &sceneId)
+    : SceneBase(sceneMgr, window, sceneId) {
   buttons.emplace(ButtonId::Start,
                   interface::Button(sf::Vector2f(100, 200), "Start"));
   buttons.emplace(ButtonId::Settings,
@@ -16,7 +15,7 @@ Menu::Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
   buttons.at(ButtonId::Start).setActive(true);
 }
 
-void Menu::handleEvents() {
+void Scene::handleEvents() {
   while (const auto &e = m_window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
       m_window.close();
@@ -26,9 +25,9 @@ void Menu::handleEvents() {
   }
 }
 
-void Menu::update() {}
+void Scene::update() {}
 
-void Menu::draw() {
+void Scene::draw() {
   m_window.clear(sf::Color::Red);
   for (auto &button : buttons) {
     m_window.draw(button.second);
@@ -36,7 +35,7 @@ void Menu::draw() {
   m_window.display();
 }
 
-void Menu::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
+void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   if (scancode == sf::Keyboard::Scancode::Escape) {
     m_window.close();
   } else if (scancode == sf::Keyboard::Scancode::Up) {
@@ -59,9 +58,9 @@ void Menu::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
     } else if (m_activeButton == ButtonId::Settings) {
       change(SceneId::Settings);
     } else if (m_activeButton == ButtonId::Start) {
-      change(SceneId::Running);
+      change(SceneId::Lobby);
     }
   }
 }
 
-} // namespace bm::scene
+} // namespace bm::scene::menu
