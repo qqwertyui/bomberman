@@ -5,12 +5,14 @@ struct ConnectionInfo;
 }
 
 namespace bm {
+class Client;
+
 class ClientManager {
 public:
   static void run();
 
 private:
-  static void handleNewConnection(const common::ConnectionInfo &info);
+  static void handleNewConnection(Client *client);
 };
 
 } // namespace bm

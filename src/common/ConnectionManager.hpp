@@ -43,7 +43,6 @@ public:
       return;
     }
     ::closeConnection(info->fd);
-    LOG_DBG("Disconnected from %s:%u", info->ip.c_str(), info->port);
     info.reset();
   }
 

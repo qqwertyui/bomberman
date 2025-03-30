@@ -1,11 +1,12 @@
 #include "ClientManager.hpp"
 
 #include "Client.hpp"
+#include "Database.hpp"
 #include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
 #include "common/Networking.hpp"
-#include "common/messages/core.pb.h"
+#include "common/itf/core.pb.h"
 #include <optional>
 #include <thread>
 
@@ -36,7 +37,7 @@ std::optional<int> setupSocket() {
   return fd;
 }
 
-std::optional<common::ConnectionInfo> accept(int fd) {
+std::optional<common::ConnectionInfo> acceptConnection(int fd) {
   struct sockaddr_in client_sin;
   socklen_t socklen = sizeof(client_sin);
   int clientFd = accept(fd, (struct sockaddr *)&client_sin, &socklen);
@@ -57,24 +58,35 @@ void ClientManager::run() {
   const auto &config{GlobalConfig::get()};
   LOG_INF("Listening for incoming connections on %s:%u",
           config.bindIp().c_str(), config.port());
+  auto &db{Database::get()};
   while (true) {
-    auto info{accept(*fd)};
-    if (not info) {
-      LOG_ERR("Accept failed: %s", strerror(errno));
+    if (db.playerLimitReached()) {
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds{config.playerLimitEvaluationTimerMs()});
       continue;
     }
-    std::thread{handleNewConnection, *info}.detach();
+
+    auto info{acceptConnection(*fd)};
+    if (not info) {
+      LOG_ERR("Couldn't accept new connection: %s", strerror(errno));
+      continue;
+    }
+    auto *client = db.addPlayer(*info);
+    if (not client) {
+      LOG_ERR("Couldn't add new player");
+      continue;
+    }
+    std::thread{handleNewConnection, client}.detach();
   }
   close(*fd);
 }
 
-void ClientManager::handleNewConnection(const common::ConnectionInfo &info) {
-  Client client{};
-  common::ConnectionManager connMgr{info};
-  client.onConnect();
+void ClientManager::handleNewConnection(Client *client) {
+  common::ConnectionManager connMgr{client->getConnection()};
+  client->onConnect();
 
-  while (auto req = connMgr.receive<C2SMessage>()) {
-    auto resp = client.onReceive(req.value());
+  while (auto req = connMgr.receive<common::itf::C2SMessage>()) {
+    auto resp = client->onReceive(req.value());
     if (not resp) {
       continue;
     }
@@ -82,7 +94,9 @@ void ClientManager::handleNewConnection(const common::ConnectionInfo &info) {
   }
 
   connMgr.disconnect();
-  client.onDisconnect();
+  client->onDisconnect();
+
+  Database::get().removePlayer(client->getId());
 }
 
 } // namespace bm

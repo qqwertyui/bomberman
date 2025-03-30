@@ -2,7 +2,7 @@
 #include "GlobalConfig.hpp"
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
-#include "common/messages/core.pb.h"
+#include "common/itf/core.pb.h"
 
 namespace bm::scene {
 Running::Running(SceneManager &sceneMgr, sf::RenderWindow &window,
@@ -16,7 +16,7 @@ void Running::handleEvents() {
     } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
       if (keyPressed->scancode == sf::Keyboard::Scancode::Enter) {
         LOG_DBG("Sending query");
-        bm::C2SMessage msg;
+        common::itf::C2SMessage msg;
         msg.mutable_query()->set_version(true);
         connMgr.send(msg);
       } else if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
@@ -34,7 +34,7 @@ void Running::onEntry() {
   connMgr.connect(GlobalConfig::get().serverIp(),
                   GlobalConfig::get().serverPort());
 
-  bm::C2SMessage req;
+  common::itf::C2SMessage req;
   auto *query = req.mutable_query();
   query->set_lobbies(true);
   if (not connMgr.send(req)) {
@@ -43,7 +43,7 @@ void Running::onEntry() {
     return;
   }
 
-  auto resp = connMgr.receive<bm::S2CMessage>();
+  auto resp = connMgr.receive<common::itf::S2CMessage>();
   if (not resp.has_value()) {
     LOG_ERR("Couldn't connect to server");
     connMgr.disconnect();

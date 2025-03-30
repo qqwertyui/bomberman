@@ -5,6 +5,8 @@ set(
   "${SERVER_DIR}/Application.cpp"
   "${SERVER_DIR}/ClientManager.cpp"
   "${SERVER_DIR}/Client.cpp"
+  "${SERVER_DIR}/Database.cpp"
+  "${SERVER_DIR}/Lobby.cpp"
 )
 
 add_executable(bomberman-server ${SERVER_SOURCES})
