@@ -1,8 +1,8 @@
 #include "Game.hpp"
 #include "GlobalConfig.hpp"
 #include "common/Log.hpp"
-#include "rsrcManagement/FontManager.hpp"
-#include "rsrcManagement/TextureManager.hpp"
+#include "resource/FontManager.hpp"
+#include "resource/TextureManager.hpp"
 #include "scene/menu/Menu.hpp"
 #include "scene/running/Running.hpp"
 #include "scene/settings/Settings.hpp"
@@ -42,15 +42,14 @@ bool Game::initialize(int argc, char **argv) {
     return false;
   }
 
-  auto &txtManager = rsrcManagement::TextureManager::instance();
-  txtManager.load(rsrcManagement::TextureId::BUTTON_ACTIVE,
+  auto &txtManager = resource::TextureManager::get();
+  txtManager.load(resource::TextureId::BUTTON_ACTIVE,
                   config.assetsDir() + "buttonActive.png");
-  txtManager.load(rsrcManagement::TextureId::BUTTON_INACTIVE,
+  txtManager.load(resource::TextureId::BUTTON_INACTIVE,
                   config.assetsDir() + "buttonInactive.png");
 
-  auto &fontManager = rsrcManagement::FontManager::instance();
-  fontManager.load(rsrcManagement::FontId::MENU,
-                   config.assetsDir() + "Inkfree.ttf");
+  auto &fontManager = resource::FontManager::get();
+  fontManager.load(resource::FontId::MENU, config.assetsDir() + "Inkfree.ttf");
 
   m_sceneMgr = createSceneManager(*m_window);
   return true;

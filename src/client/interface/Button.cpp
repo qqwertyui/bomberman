@@ -1,20 +1,19 @@
 #include "Button.hpp"
-#include "rsrcManagement/FontManager.hpp"
-#include "rsrcManagement/TextureManager.hpp"
+#include "resource/FontManager.hpp"
+#include "resource/TextureManager.hpp"
 
 namespace bm::interface {
 Button::Button(const sf::Vector2f &position, const std::string &label,
                unsigned int characterSize)
-    : m_buttonSprite{rsrcManagement::TextureManager::instance().get(
-          rsrcManagement::TextureId::BUTTON_INACTIVE)},
-      m_buttonLabel{rsrcManagement::FontManager::instance().get(
-          rsrcManagement::FontId::MENU)}
+    : m_buttonSprite{resource::TextureManager::get().at(
+          resource::TextureId::BUTTON_INACTIVE)},
+      m_buttonLabel{resource::FontManager::get().at(resource::FontId::MENU)}
 
 {
   m_buttonSprite.setPosition(position);
   auto buttonSize = m_buttonSprite.getTexture().getSize();
 
-  auto &fontManager = rsrcManagement::FontManager::instance();
+  auto &fontManager = resource::FontManager::get();
   m_buttonLabel.setString(label);
   m_buttonLabel.setCharacterSize(characterSize);
 
@@ -27,10 +26,10 @@ Button::Button(const sf::Vector2f &position, const std::string &label,
 }
 
 void Button::setActive(bool active) {
-  auto &txtManager = rsrcManagement::TextureManager::instance();
-  auto &newTexture =
-      active ? txtManager.get(rsrcManagement::TextureId::BUTTON_ACTIVE)
-             : txtManager.get(rsrcManagement::TextureId::BUTTON_INACTIVE);
+  auto &txtManager = resource::TextureManager::get();
+  auto &newTexture = active
+                         ? txtManager.at(resource::TextureId::BUTTON_ACTIVE)
+                         : txtManager.at(resource::TextureId::BUTTON_INACTIVE);
   m_buttonSprite.setTexture(newTexture, true);
 }
 

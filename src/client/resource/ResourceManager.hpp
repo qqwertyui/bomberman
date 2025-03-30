@@ -4,7 +4,7 @@
 #include <map>
 #include <stdexcept>
 
-namespace bm::rsrcManagement {
+namespace bm::resource {
 template <typename ResourceType, typename ResourceIdType>
 class ResourceManager {
 public:
@@ -13,7 +13,7 @@ public:
   ResourceManager &operator=(const ResourceManager &) = delete;
   ResourceManager &operator=(ResourceManager &&) = delete;
 
-  static ResourceManager<ResourceType, ResourceIdType> &instance() {
+  static ResourceManager<ResourceType, ResourceIdType> &get() {
     static ResourceManager<ResourceType, ResourceIdType> instance;
     return instance;
   }
@@ -28,7 +28,7 @@ public:
     }
   }
 
-  ResourceType &get(const ResourceIdType id) {
+  ResourceType &at(const ResourceIdType id) {
     if (resourceMap.count(id) == 0) {
       LOG_WRN("Couldn't retreive resource");
       return invalidResource;
@@ -42,4 +42,4 @@ private:
   ResourceType invalidResource{};
 };
 
-}; // namespace bm::rsrcManagement
+}; // namespace bm::resource
