@@ -8,7 +8,7 @@ Menu::Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
            const SceneId &sceneId)
     : Scene(sceneMgr, window, sceneId) {
   buttons.emplace(ButtonId::Start,
-                  interface::Button(sf::Vector2f(0, 0), "Start"));
+                  interface::Button(sf::Vector2f(100, 200), "Start"));
   buttons.emplace(ButtonId::Settings,
                   interface::Button(sf::Vector2f(0, 60), "Settings"));
   buttons.emplace(ButtonId::Exit,
