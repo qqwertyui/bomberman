@@ -4,8 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-namespace bomberman {
-
+namespace bm {
 class Game {
 public:
   int run(int argc, char **argv);
@@ -23,4 +22,4 @@ private:
   std::unique_ptr<sf::RenderWindow> m_window;
 };
 
-} // namespace bomberman
+} // namespace bm

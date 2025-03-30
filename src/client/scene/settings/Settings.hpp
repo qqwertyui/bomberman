@@ -2,7 +2,7 @@
 
 #include "scene/Scene.hpp"
 
-namespace bomberman::scene {
+namespace bm::scene {
 class Settings : public Scene {
 public:
   Settings(SceneManager &sceneMgr, sf::RenderWindow &window,
@@ -12,4 +12,5 @@ public:
   void update() override;
   void draw() override;
 };
-} // namespace bomberman::scene
+
+} // namespace bm::scene

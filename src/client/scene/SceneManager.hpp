@@ -4,7 +4,7 @@
 #include <list>
 #include <memory>
 
-namespace bomberman::scene {
+namespace bm::scene {
 class SceneManager {
 public:
   SceneManager() = default;
@@ -19,4 +19,5 @@ private:
   std::list<std::unique_ptr<Scene>> scenes{};
   Scene *activeScene{nullptr};
 };
-} // namespace bomberman::scene
+
+} // namespace bm::scene

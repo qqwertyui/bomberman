@@ -1,7 +1,7 @@
 #include "ArgumentParser.hpp"
 #include <string_view>
 
-namespace bomberman::common {
+namespace bm::common {
 static constexpr std::string_view prefix{"--"};
 
 bool isValidPrefix(const std::string &arg) {
@@ -48,4 +48,4 @@ ArgumentParser::parse(const std::vector<std::string> &args) {
   }
   return result;
 }
-} // namespace bomberman::common
+} // namespace bm::common

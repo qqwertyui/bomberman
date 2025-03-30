@@ -7,8 +7,7 @@
 #include "scene/running/Running.hpp"
 #include "scene/settings/Settings.hpp"
 
-namespace bomberman {
-
+namespace bm {
 std::unique_ptr<scene::SceneManager>
 Game::createSceneManager(sf::RenderWindow &window) {
   auto sceneMgr = std::make_unique<scene::SceneManager>();
@@ -83,4 +82,4 @@ void Game::update() { m_sceneMgr->getActive().update(); }
 
 void Game::draw() { m_sceneMgr->getActive().draw(); }
 
-} // namespace bomberman
+} // namespace bm

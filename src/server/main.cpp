@@ -13,22 +13,21 @@ struct ClientInfo {
   unsigned int port;
 };
 
-void handleQuery(const bomberman::QueryReq &req, bomberman::QueryResp &resp) {
+void handleQuery(const bm::QueryReq &req, bm::QueryResp &resp) {
   if (req.has_version()) {
-    resp.set_version(bomberman::GlobalConfig::get().version());
+    resp.set_version(bm::GlobalConfig::get().version());
   }
   if (req.has_lobbies()) {
-    for (int i = 0; i < bomberman::GlobalConfig::get().numberOfLobbies(); i++) {
+    for (int i = 0; i < bm::GlobalConfig::get().numberOfLobbies(); i++) {
       auto *lobby = resp.add_lobbies();
       lobby->set_id(i);
       lobby->set_connectedplayers(0);
-      lobby->set_maxplayers(bomberman::GlobalConfig::get().maxLobbySize());
+      lobby->set_maxplayers(bm::GlobalConfig::get().maxLobbySize());
     }
   }
 }
 
-void handleUpdate(const bomberman::UpdateReq &req,
-                  bomberman::UpdateResp &resp) {
+void handleUpdate(const bm::UpdateReq &req, bm::UpdateResp &resp) {
   if (req.has_lobby()) {
     //
   }
@@ -37,8 +36,7 @@ void handleUpdate(const bomberman::UpdateReq &req,
   }
 }
 
-bool handleMessage(const bomberman::C2SMessage &req,
-                   bomberman::S2CMessage &resp) {
+bool handleMessage(const bm::C2SMessage &req, bm::S2CMessage &resp) {
   if (req.has_query()) {
     handleQuery(req.query(), *resp.mutable_query());
   }
@@ -52,10 +50,10 @@ bool handleMessage(const bomberman::C2SMessage &req,
 void handleClient(const ClientInfo clientInfo) {
   LOG_INF("[+] Connected from %s:%u", clientInfo.ip.c_str(), clientInfo.port);
 
-  bomberman::common::ConnectionManager connMgr{clientInfo.fd};
+  bm::common::ConnectionManager connMgr{clientInfo.fd};
 
-  while (auto req = connMgr.receive<bomberman::C2SMessage>()) {
-    bomberman::S2CMessage resp;
+  while (auto req = connMgr.receive<bm::C2SMessage>()) {
+    bm::S2CMessage resp;
     if (not handleMessage(req.value(), resp)) {
       break;
     }
@@ -70,7 +68,7 @@ void handleClient(const ClientInfo clientInfo) {
 
 int main(int argc, char **argv) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
-  if (not bomberman::GlobalConfig::load(argc, argv)) {
+  if (not bm::GlobalConfig::load(argc, argv)) {
     return 1;
   }
 
@@ -90,7 +88,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  const auto &config{bomberman::GlobalConfig::get()};
+  const auto &config{bm::GlobalConfig::get()};
   struct sockaddr_in server_sin;
   server_sin.sin_family = AF_INET;
   server_sin.sin_port = htons(config.port());

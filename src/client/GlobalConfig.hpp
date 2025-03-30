@@ -2,7 +2,7 @@
 
 #include "common/GlobalConfigBase.hpp"
 
-namespace bomberman {
+namespace bm {
 struct Params {
   PARAMETER(uint16_t, maxFps, 60);
   PARAMETER(std::string, assetsDir, "assets/");
@@ -11,6 +11,7 @@ struct Params {
   PARAMETER(uint16_t, windowWidth, 640);
   PARAMETER(uint16_t, windowHeight, 480);
 };
-using GlobalConfig = GlobalConfigBase<Params>;
 
-} // namespace bomberman
+using GlobalConfig = common::GlobalConfigBase<Params>;
+
+} // namespace bm

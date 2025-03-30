@@ -2,8 +2,7 @@
 #include "common/Log.hpp"
 #include <algorithm>
 
-namespace bomberman::scene {
-
+namespace bm::scene {
 SceneManager::SceneManager(std::list<std::unique_ptr<Scene>> &&scenes)
     : scenes(std::move(scenes)) {}
 
@@ -50,4 +49,4 @@ Scene *SceneManager::getSceneById(const SceneId &sceneId) {
 
 Scene &SceneManager::getActive() { return *activeScene; }
 
-} // namespace bomberman::scene
+} // namespace bm::scene

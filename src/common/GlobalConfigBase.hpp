@@ -10,7 +10,7 @@
 #include "ArgumentParser.hpp"
 #include "Log.hpp"
 
-namespace bomberman {
+namespace bm::common {
 // integral types
 template <typename T, std::enable_if_t<std::is_integral<T>::value &&
                                            not std::is_same<T, bool>::value,
@@ -64,15 +64,15 @@ private:
 };
 
 #define PARAMETER(type, name, value)                                           \
-  class class_##name : public ParameterBase {                                  \
+  class class_##name : public bm::common::ParameterBase {                      \
   public:                                                                      \
     std::string asString() const override {                                    \
-      return #name + std::string("=") + toString<type>(m_value);               \
+      return #name + std::string("=") + bm::common::toString<type>(m_value);   \
     }                                                                          \
     std::string getName() const override { return #name; }                     \
     const type &operator()() const { return m_value; }                         \
     void loadFromString(const std::string &newValue) override {                \
-      m_value = fromString<type>(newValue);                                    \
+      m_value = bm::common::fromString<type>(newValue);                        \
     }                                                                          \
                                                                                \
   private:                                                                     \
@@ -152,4 +152,4 @@ private:
   inline static GlobalConfigBase *instance;
 };
 
-} // namespace bomberman
+} // namespace bm::common

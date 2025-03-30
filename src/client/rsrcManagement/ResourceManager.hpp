@@ -4,7 +4,7 @@
 #include <map>
 #include <stdexcept>
 
-namespace bomberman::rsrcManagement {
+namespace bm::rsrcManagement {
 template <typename ResourceType, typename ResourceIdType>
 class ResourceManager {
 public:
@@ -41,4 +41,5 @@ private:
   std::map<ResourceIdType, ResourceType> resourceMap{};
   ResourceType invalidResource{};
 };
-}; // namespace bomberman::rsrcManagement
+
+}; // namespace bm::rsrcManagement

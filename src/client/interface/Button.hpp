@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
-namespace bomberman::interface {
+namespace bm::interface {
 class Button : public sf::Drawable, public sf::Transformable {
 public:
   Button(const sf::Vector2f &position, const std::string &label,
@@ -17,4 +17,4 @@ private:
   sf::Text m_buttonLabel;
 };
 
-} // namespace bomberman::interface
+} // namespace bm::interface

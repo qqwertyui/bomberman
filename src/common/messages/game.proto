@@ -1,5 +1,5 @@
 syntax = "proto2";
-package bomberman;
+package bm;
 
 
 message Position {
