@@ -1,5 +1,5 @@
 syntax = "proto2";
-package bm;
+package bm.common.itf;
 
 
 message Lobby {

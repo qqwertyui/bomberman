@@ -5,7 +5,7 @@ set(COMMON_SOURCES
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-add_subdirectory(messages)
+add_subdirectory(itf)
 
 add_library(common STATIC ${COMMON_SOURCES})
 if (WIN32)

@@ -1,6 +1,7 @@
 #include "Application.hpp"
 
 #include "ClientManager.hpp"
+#include "Database.hpp"
 #include "GlobalConfig.hpp"
 #include "common/Log.hpp"
 #include "common/Networking.hpp"
@@ -22,9 +23,17 @@ bool Application::initialize(int argc, char **argv) {
   return true;
 }
 
+bool createDatabase() {
+  return Database::create(GlobalConfig::get().maxNumberOfLobbies(),
+                          GlobalConfig::get().maxNumberOfPlayers());
+}
+
 int Application::run(int argc, char **argv) {
   if (not initialize(argc, argv)) {
     return 1;
+  }
+  if (not createDatabase()) {
+    return 2;
   }
   std::thread{ClientManager::run}.detach();
 
