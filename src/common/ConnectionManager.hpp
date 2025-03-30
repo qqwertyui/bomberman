@@ -6,7 +6,7 @@
 #include <optional>
 #include <string>
 
-namespace bomberman::common {
+namespace bm::common {
 class ConnectionManager {
 public:
   ConnectionManager() = default;
@@ -99,4 +99,4 @@ public:
 private:
   std::optional<int> fileDescriptor;
 };
-} // namespace bomberman::common
+} // namespace bm::common

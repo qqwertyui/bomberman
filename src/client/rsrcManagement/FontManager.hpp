@@ -6,8 +6,9 @@ namespace sf {
 class Font;
 }
 
-namespace bomberman::rsrcManagement {
+namespace bm::rsrcManagement {
 enum class FontId { MENU };
 
 typedef ResourceManager<sf::Font, FontId> FontManager;
-}; // namespace bomberman::rsrcManagement
+
+}; // namespace bm::rsrcManagement

@@ -2,7 +2,7 @@
 
 #include "common/GlobalConfigBase.hpp"
 
-namespace bomberman {
+namespace bm {
 struct Params {
   PARAMETER(std::string, bindIp, "0.0.0.0");
   PARAMETER(uint16_t, port, 1111);
@@ -11,6 +11,7 @@ struct Params {
   PARAMETER(int, numberOfLobbies, 10);
   PARAMETER(int, version, 1);
 };
-using GlobalConfig = GlobalConfigBase<Params>;
 
-} // namespace bomberman
+using GlobalConfig = common::GlobalConfigBase<Params>;
+
+} // namespace bm

@@ -2,7 +2,7 @@
 #include "rsrcManagement/FontManager.hpp"
 #include "rsrcManagement/TextureManager.hpp"
 
-namespace bomberman::interface {
+namespace bm::interface {
 Button::Button(const sf::Vector2f &position, const std::string &label,
                unsigned int characterSize)
     : m_buttonSprite{rsrcManagement::TextureManager::instance().get(
@@ -42,4 +42,4 @@ void Button::draw(sf::RenderTarget &target,
   target.draw(m_buttonSprite, localStates);
   target.draw(m_buttonLabel, localStates);
 }
-}; // namespace bomberman::interface
+}; // namespace bm::interface

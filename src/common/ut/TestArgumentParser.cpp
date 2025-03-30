@@ -2,7 +2,7 @@
 
 #include "common/ArgumentParser.cpp"
 
-namespace bomberman::common {
+namespace bm::common {
 class TestArgumentParser : public ::testing::Test {
 protected:
   ArgumentParser sut;
@@ -81,4 +81,4 @@ int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-} // namespace bomberman::common
+} // namespace bm::common

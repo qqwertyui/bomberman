@@ -4,7 +4,7 @@
 #include "scene/Scene.hpp"
 #include <map>
 
-namespace bomberman::scene {
+namespace bm::scene {
 class Menu : public Scene {
 public:
   Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
@@ -21,4 +21,4 @@ private:
   ButtonId m_activeButton{ButtonId::Start};
   std::map<ButtonId, interface::Button> buttons;
 };
-} // namespace bomberman::scene
+} // namespace bm::scene

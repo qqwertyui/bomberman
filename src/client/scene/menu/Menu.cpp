@@ -2,7 +2,7 @@
 #include "rsrcManagement/TextureManager.hpp"
 #include <iostream>
 
-namespace bomberman::scene {
+namespace bm::scene {
 
 Menu::Menu(SceneManager &sceneMgr, sf::RenderWindow &window,
            const SceneId &sceneId)
@@ -65,4 +65,4 @@ void Menu::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   }
 }
 
-} // namespace bomberman::scene
+} // namespace bm::scene

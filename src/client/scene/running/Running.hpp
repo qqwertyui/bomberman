@@ -3,7 +3,7 @@
 #include "common/ConnectionManager.hpp"
 #include "scene/Scene.hpp"
 
-namespace bomberman::scene {
+namespace bm::scene {
 class Running : public Scene {
 public:
   Running(SceneManager &sceneMgr, sf::RenderWindow &window,
@@ -19,4 +19,5 @@ private:
   common::ConnectionManager connMgr;
   int x, y;
 };
-} // namespace bomberman::scene
+
+} // namespace bm::scene

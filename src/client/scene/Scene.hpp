@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-namespace bomberman::scene {
+namespace bm::scene {
 class SceneManager;
 
 enum class SceneId : unsigned int {
@@ -33,4 +33,5 @@ protected:
   sf::RenderWindow &m_window;
   SceneManager &m_sceneMgr;
 };
-} // namespace bomberman::scene
+
+} // namespace bm::scene

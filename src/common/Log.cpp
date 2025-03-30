@@ -4,7 +4,7 @@
 #include <cstring>
 #include <ctime>
 
-namespace bomberman::common {
+namespace bm::common {
 void log(FILE *stream, const char *severity, const char *path, int line,
          const char *format, ...) {
   timespec ts;
@@ -24,4 +24,4 @@ void log(FILE *stream, const char *severity, const char *path, int line,
   fprintf(stream, "\n");
 }
 
-} // namespace bomberman::common
+} // namespace bm::common

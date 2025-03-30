@@ -1,8 +1,7 @@
 #include "Settings.hpp"
 #include "common/Log.hpp"
 
-namespace bomberman::scene {
-
+namespace bm::scene {
 Settings::Settings(SceneManager &sceneMgr, sf::RenderWindow &window,
                    const SceneId &sceneId)
     : Scene(sceneMgr, window, sceneId) {}
@@ -28,4 +27,4 @@ void Settings::draw() {
   m_window.display();
 }
 
-} // namespace bomberman::scene
+} // namespace bm::scene
