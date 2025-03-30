@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -38,6 +39,8 @@ private:
   unsigned int connectedCounter{};
   const unsigned int maxPlayers;
   const unsigned int maxLobbies;
+
+  mutable std::mutex mtx;
 };
 
 } // namespace bm

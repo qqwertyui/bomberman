@@ -6,6 +6,7 @@
 #include "common/Log.hpp"
 #include "common/Utils.hpp"
 #include <cassert>
+#include <mutex>
 
 namespace bm {
 bool Database::create(unsigned int maxLobbies, unsigned int maxPlayers) {
@@ -39,6 +40,7 @@ Lobby &Database::getLobbyById(unsigned int id) {
 unsigned int Database::getNumberOfLobbies() const { return lobbies.size(); }
 
 Client *Database::getPlayerById(unsigned int id) {
+  std::lock_guard<std::mutex> guard(mtx);
   assert(common::inRange(id, 0u, maxPlayers - 1));
 
   auto &player = players[id];
@@ -61,6 +63,7 @@ std::optional<unsigned int> Database::findFreePlayerEntryId() {
 }
 
 Client *Database::addPlayer(const common::ConnectionInfo &connection) {
+  std::lock_guard<std::mutex> guard(mtx);
   if (connectedCounter >= maxPlayers) {
     return nullptr;
   }
@@ -76,6 +79,7 @@ Client *Database::addPlayer(const common::ConnectionInfo &connection) {
 }
 
 void Database::removePlayer(unsigned int id) {
+  std::lock_guard<std::mutex> guard(mtx);
   assert(common::inRange(id, 0u, maxPlayers - 1));
 
   auto &player = players[id];
