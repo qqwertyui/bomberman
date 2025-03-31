@@ -9,9 +9,8 @@ enum class SceneId : unsigned int { Menu, Settings, Pause, Lobby, Game };
 
 class SceneBase {
 public:
-  SceneBase(SceneManager &sceneMgr, sf::RenderWindow &window,
-            const SceneId &sceneId)
-      : m_sceneMgr(sceneMgr), m_window(window), m_sceneId(sceneId) {}
+  SceneBase(SceneManager &sceneMgr, sf::RenderWindow &window)
+      : m_sceneMgr(sceneMgr), m_window(window) {}
   ~SceneBase() = default;
 
   virtual void handleEvents() = 0;
@@ -20,10 +19,8 @@ public:
   virtual void onEntry(){};
   virtual void onLeave(){};
   void change(const SceneId &sceneId);
-  inline SceneId getId() const { return m_sceneId; }
 
 protected:
-  const SceneId m_sceneId;
   sf::RenderWindow &m_window;
   SceneManager &m_sceneMgr;
 };

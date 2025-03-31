@@ -1,27 +1,14 @@
 #include "Game.hpp"
 #include "GlobalConfig.hpp"
 #include "common/Log.hpp"
+#include "common/Networking.hpp"
 #include "resource/FontManager.hpp"
 #include "resource/TextureManager.hpp"
-#include "scene/lobby/Scene.hpp"
-#include "scene/menu/Scene.hpp"
-#include "scene/settings/Scene.hpp"
 
 namespace bm {
 std::unique_ptr<scene::SceneManager>
 Game::createSceneManager(sf::RenderWindow &window) {
-  auto sceneMgr = std::make_unique<scene::SceneManager>();
-  auto menu = std::make_unique<scene::menu::Scene>(*sceneMgr, window,
-                                                   scene::SceneId::Menu);
-  auto lobby = std::make_unique<scene::lobby::Scene>(*sceneMgr, window,
-                                                     scene::SceneId::Lobby);
-  auto settings = std::make_unique<scene::settings::Scene>(
-      *sceneMgr, window, scene::SceneId::Settings);
-
-  sceneMgr->add(std::move(menu));
-  sceneMgr->add(std::move(lobby));
-  sceneMgr->add(std::move(settings));
-  sceneMgr->change(scene::SceneId::Menu);
+  auto sceneMgr = std::make_unique<scene::SceneManager>(window);
   return sceneMgr;
 }
 

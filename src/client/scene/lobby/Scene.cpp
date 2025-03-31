@@ -5,9 +5,8 @@
 #include "common/itf/core.pb.h"
 
 namespace bm::scene::lobby {
-Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
-             const SceneId &sceneId)
-    : SceneBase(sceneMgr, window, sceneId) {}
+Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window)
+    : SceneBase(sceneMgr, window) {}
 
 void Scene::handleEvents() {
   while (const auto &e = m_window.pollEvent()) {
