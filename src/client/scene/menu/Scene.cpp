@@ -2,9 +2,8 @@
 #include "resource/TextureManager.hpp"
 
 namespace bm::scene::menu {
-Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
-             const SceneId &sceneId)
-    : SceneBase(sceneMgr, window, sceneId) {
+Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window)
+    : SceneBase(sceneMgr, window) {
   buttons.emplace(ButtonId::Start,
                   interface::Button(sf::Vector2f(100, 200), "Start"));
   buttons.emplace(ButtonId::Settings,

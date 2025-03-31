@@ -7,8 +7,7 @@
 namespace bm::scene::menu {
 class Scene : public SceneBase {
 public:
-  Scene(SceneManager &sceneMgr, sf::RenderWindow &window,
-        const SceneId &sceneId);
+  Scene(SceneManager &sceneMgr, sf::RenderWindow &window);
 
   void handleEvents() override;
   void update() override;
