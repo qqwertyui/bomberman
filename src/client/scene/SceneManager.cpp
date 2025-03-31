@@ -1,17 +1,16 @@
 #include "SceneManager.hpp"
 #include "common/Log.hpp"
-#include "scene/lobby/Scene.hpp"
-#include "scene/menu/Scene.hpp"
-#include "scene/settings/Scene.hpp"
+#include "lobby/Scene.hpp"
+#include "menu/Scene.hpp"
+#include "settings/Scene.hpp"
 #include <SFML/Graphics.hpp>
 #include <cassert>
-#include <type_traits>
 
 namespace bm::scene {
-SceneManager::SceneManager(sf::RenderWindow &window) {
-  add(scene::SceneId::Menu, new menu::Scene(*this, window));
-  add(scene::SceneId::Lobby, new lobby::Scene(*this, window));
-  add(scene::SceneId::Settings, new settings::Scene(*this, window));
+SceneManager::SceneManager(sf::RenderWindow &window) : window(window) {
+  add(SceneId::Menu, new menu::Scene(*this));
+  add(SceneId::Lobby, new lobby::Scene(*this));
+  add(SceneId::Settings, new settings::Scene(*this));
 
   change(SceneId::Menu);
 }
@@ -59,5 +58,13 @@ SceneBase &SceneManager::getActive() {
   assert(active != nullptr);
   return *active;
 }
+
+void SceneManager::handleEvents() { getActive().handleEvents(); }
+
+void SceneManager::update() { getActive().update(); }
+
+void SceneManager::draw() { getActive().draw(); }
+
+sf::RenderWindow &SceneManager::getWindow() { return window; }
 
 } // namespace bm::scene

@@ -1,28 +1,31 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include "SceneId.hpp"
+
+namespace sf {
+class RenderWindow;
+}
 
 namespace bm::scene {
 class SceneManager;
 
-enum class SceneId : unsigned int { Menu, Settings, Pause, Lobby, Game };
-
 class SceneBase {
 public:
-  SceneBase(SceneManager &sceneMgr, sf::RenderWindow &window)
-      : m_sceneMgr(sceneMgr), m_window(window) {}
-  ~SceneBase() = default;
+  SceneBase(SceneManager &sceneManager);
+  ~SceneBase();
+
+  virtual void onEntry(){};
+  virtual void onLeave(){};
 
   virtual void handleEvents() = 0;
   virtual void update() = 0;
   virtual void draw() = 0;
-  virtual void onEntry(){};
-  virtual void onLeave(){};
+
+  sf::RenderWindow &getWindow();
   void change(const SceneId &sceneId);
 
-protected:
-  sf::RenderWindow &m_window;
-  SceneManager &m_sceneMgr;
+private:
+  SceneManager &sceneManager;
 };
 
 } // namespace bm::scene

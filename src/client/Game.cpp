@@ -62,10 +62,10 @@ int Game::run(int argc, char **argv) {
   return 0;
 }
 
-void Game::handleEvents() { m_sceneMgr->getActive().handleEvents(); }
+void Game::handleEvents() { m_sceneMgr->handleEvents(); }
 
-void Game::update() { m_sceneMgr->getActive().update(); }
+void Game::update() { m_sceneMgr->update(); }
 
-void Game::draw() { m_sceneMgr->getActive().draw(); }
+void Game::draw() { m_sceneMgr->draw(); }
 
 } // namespace bm

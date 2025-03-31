@@ -3,15 +3,17 @@
 #include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
 #include "common/itf/core.pb.h"
+#include <SFML/Graphics.hpp>
 
 namespace bm::scene::lobby {
-Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window)
-    : SceneBase(sceneMgr, window) {}
+Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {}
 
 void Scene::handleEvents() {
-  while (const auto &e = m_window.pollEvent()) {
+  auto &window{getWindow()};
+
+  while (const auto &e = window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
-      m_window.close();
+      window.close();
     } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
       if (keyPressed->scancode == sf::Keyboard::Scancode::Enter) {
         LOG_DBG("Sending query");
@@ -66,8 +68,10 @@ void Scene::onLeave() { connMgr.disconnect(); }
 void Scene::update() {}
 
 void Scene::draw() {
-  m_window.clear(sf::Color::Blue);
-  m_window.display();
+  auto &window{getWindow()};
+
+  window.clear(sf::Color::Blue);
+  window.display();
 }
 
 } // namespace bm::scene::lobby
