@@ -1,14 +1,16 @@
 #include "Scene.hpp"
 #include "common/Log.hpp"
+#include <SFML/Graphics.hpp>
 
 namespace bm::scene::settings {
-Scene::Scene(SceneManager &sceneMgr, sf::RenderWindow &window)
-    : SceneBase(sceneMgr, window) {}
+Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {}
 
 void Scene::handleEvents() {
-  while (const auto &e = m_window.pollEvent()) {
+  auto &window{getWindow()};
+
+  while (const auto &e = window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
-      m_window.close();
+      window.close();
     } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
       if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
         change(SceneId::Menu);
@@ -22,8 +24,10 @@ void Scene::handleEvents() {
 void Scene::update() {}
 
 void Scene::draw() {
-  m_window.clear(sf::Color::Green);
-  m_window.display();
+  auto &window{getWindow()};
+
+  window.clear(sf::Color::Green);
+  window.display();
 }
 
 } // namespace bm::scene::settings
