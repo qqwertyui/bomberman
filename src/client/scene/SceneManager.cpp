@@ -1,5 +1,6 @@
 #include "SceneManager.hpp"
 #include "common/Log.hpp"
+#include "game/Scene.hpp"
 #include "lobby/Scene.hpp"
 #include "menu/Scene.hpp"
 #include "settings/Scene.hpp"
@@ -9,8 +10,9 @@
 namespace bm::scene {
 SceneManager::SceneManager(sf::RenderWindow &window) : window(window) {
   add(SceneId::Menu, new menu::Scene(*this));
-  add(SceneId::Lobby, new lobby::Scene(*this));
   add(SceneId::Settings, new settings::Scene(*this));
+  add(SceneId::Lobby, new lobby::Scene(*this));
+  add(SceneId::Game, new game::Scene(*this));
 
   change(SceneId::Menu);
 }
