@@ -30,11 +30,21 @@ void handleQuery(const common::itf::QueryReq &req,
   }
 }
 
+void handleGameUpdate(const common::itf::UpdateGameReq &req,
+                      common::itf::UpdateGameResp &resp) {
+  if (req.has_position()) {
+    [[maybe_unused]] const int x{req.position().x()};
+    [[maybe_unused]] const int y{req.position().y()};
+    resp.set_ispositionok(true);
+  }
+}
+
 void handleUpdate(const common::itf::UpdateReq &req,
                   common::itf::UpdateResp &resp) {
   if (req.has_lobby()) {
   }
   if (req.has_game()) {
+    handleGameUpdate(req.game(), *resp.mutable_game());
   }
 }
 
