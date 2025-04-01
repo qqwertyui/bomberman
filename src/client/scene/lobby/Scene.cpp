@@ -25,6 +25,9 @@ void Scene::handleEvents() {
       } else {
         LOG_DBG("Running key pressed!");
       }
+    } else if (const auto *mouseButton =
+                   e->getIf<sf::Event::MouseButtonPressed>()) {
+      handleMouseEvent(mouseButton->button);
     }
   }
 }
@@ -55,22 +58,73 @@ void Scene::onEntry() {
     LOG_INF("No active lobbies");
     return;
   }
-
-  LOG_INF("Active lobbies: ");
+  lobbyData.clear();
   for (const auto &lobby : resp->query().lobbies()) {
-    LOG_INF("[id: %d]: %d/%d", lobby.id(), lobby.connectedplayers(),
-            lobby.maxplayers());
+    lobbyData.emplace_back(lobby.connectedplayers(), lobby.maxplayers());
+  }
+  createLobbyButton(lobbyData);
+}
+void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
+  auto &window{getWindow()};
+  auto localPos = sf::Mouse::getPosition(window);
+  sf::Vector2f mousePos(static_cast<float>(localPos.x),
+                        static_cast<float>(localPos.y));
+  if (button == sf::Mouse::Button::Left) {
+    for (const auto &[index, lobbyButton] : lobbyButtons) {
+      if (lobbyButton.getButtonBounds().contains(mousePos)) {
+        change(SceneId::Game);
+      }
+    }
   }
 }
-
+void Scene::createLobbyButton(
+    const std::vector<std::pair<int, int>> &lobbyData) {
+  auto &window{getWindow()};
+  float buttonSpacing{20.0f};
+  sf::Vector2f buttonSize{190.0f, 49.0f};
+  float centerY = window.getSize().y / 2.0f;
+  float centerX = window.getSize().x / 2.0f;
+  int buttonInColumn{4};
+  float totalColumnHeight =
+      buttonInColumn * buttonSize.y + (buttonInColumn - 1) * buttonSpacing;
+  float startX = buttonSpacing;
+  float startY = centerY - totalColumnHeight / 2.0f;
+  lobbyButtons.clear();
+  for (int i = 0; i < lobbyData.size(); i++) {
+    const auto &[connected, max] = lobbyData[i];
+    std::string label =
+        std::to_string(connected) + "/" + std::to_string(max) + " players";
+    int column = i / buttonInColumn;
+    int row = i % buttonInColumn;
+    sf::Vector2f buttonPos(startX + column * (buttonSize.x + buttonSpacing),
+                           startY + row * (buttonSize.y + buttonSpacing));
+    lobbyButtons.emplace(i, interface::Button(buttonPos, label));
+  }
+}
 void Scene::onLeave() { connMgr.disconnect(); }
 
-void Scene::update() {}
+void Scene::update() {
+  auto &window = getWindow();
+  auto localPos = sf::Mouse::getPosition(window);
+  sf::Vector2f mousePos(static_cast<float>(localPos.x),
+                        static_cast<float>(localPos.y));
+
+  for (auto &[index, lobbyButton] : lobbyButtons) {
+    if (lobbyButton.getButtonBounds().contains(mousePos)) {
+      lobbyButton.setActive(true);
+    } else {
+      lobbyButton.setActive(false);
+    }
+  }
+}
 
 void Scene::draw() {
   auto &window{getWindow()};
 
   window.clear(sf::Color::Blue);
+  for (const auto &[index, lobbyButton] : lobbyButtons) {
+    window.draw(lobbyButton);
+  }
   window.display();
 }
 
