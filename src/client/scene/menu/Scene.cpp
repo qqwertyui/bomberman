@@ -44,14 +44,12 @@ void Scene::update() {
   auto localpos = sf::Mouse::getPosition(window);
   sf::Vector2f mousePosf(static_cast<float>(localpos.x),
                          static_cast<float>(localpos.y));
-
   for (auto &button : buttons) {
     if (button.second.getButtonBounds().contains(mousePosf)) {
       m_activeButton = button.first;
       button.second.setActive(true);
     } else if (m_activeButton == button.first) {
       button.second.setActive(false);
-      m_activeButton = ButtonId::None;
     }
   }
 }
@@ -102,17 +100,17 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   if (scancode == sf::Keyboard::Scancode::Escape) {
     window.close();
   } else if (scancode == sf::Keyboard::Scancode::Up) {
-    if (m_activeButton < ButtonId::Start) {
-      buttons.at(m_activeButton).setActive(false);
-      m_activeButton =
-          static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) + 1);
-      buttons.at(m_activeButton).setActive(true);
-    }
-  } else if (scancode == sf::Keyboard::Scancode::Down) {
-    if (m_activeButton > ButtonId::Exit) {
+    if (m_activeButton > ButtonId::Start) {
       buttons.at(m_activeButton).setActive(false);
       m_activeButton =
           static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) - 1);
+      buttons.at(m_activeButton).setActive(true);
+    }
+  } else if (scancode == sf::Keyboard::Scancode::Down) {
+    if (m_activeButton < ButtonId::Exit) {
+      buttons.at(m_activeButton).setActive(false);
+      m_activeButton =
+          static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) + 1);
       buttons.at(m_activeButton).setActive(true);
     }
   } else if (scancode == sf::Keyboard::Scancode::Enter) {
@@ -126,4 +124,34 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   }
 }
 
+void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
+  auto &window{getWindow()};
+  auto localpos = sf::Mouse::getPosition(window);
+  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
+                         static_cast<float>(localpos.y));
+  for (auto &button : buttons) {
+    if (button.second.getButtonBounds().contains(mousePosf)) {
+      if (m_activeButton == button.first) {
+        buttons.at(m_activeButton).setActive(false);
+        m_activeButton = button.first;
+        button.second.setActive(true);
+      }
+    } else {
+      button.second.setActive(false);
+    }
+  }
+  if (button == sf::Mouse::Button::Left) {
+    for (auto &button : buttons) {
+      if (button.second.getButtonBounds().contains(mousePosf)) {
+        if (button.first == ButtonId::Exit) {
+          window.close();
+        } else if (button.first == ButtonId::Settings) {
+          change(SceneId::Settings);
+        } else if (button.first == ButtonId::Start) {
+          change(SceneId::Lobby);
+        }
+      }
+    }
+  }
+}
 } // namespace bm::scene::menu

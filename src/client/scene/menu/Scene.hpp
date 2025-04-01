@@ -21,10 +21,9 @@ private:
     Settings,
     Start,
     NumberOfButtons,
-    None
   };
   ButtonId m_activeButton{ButtonId::Start};
   std::map<ButtonId, interface::Button> buttons;
+  bool keyboardActive{false};
 };
-
 } // namespace bm::scene::menu
