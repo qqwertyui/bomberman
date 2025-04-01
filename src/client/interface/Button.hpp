@@ -11,6 +11,7 @@ public:
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
   void setActive(bool active);
+  sf::FloatRect getButtonBounds() const;
 
 private:
   sf::Sprite m_buttonSprite;

@@ -3,13 +3,23 @@
 #include <SFML/Graphics.hpp>
 
 namespace bm::scene::menu {
+
 Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {
-  buttons.emplace(ButtonId::Start,
-                  interface::Button(sf::Vector2f(100, 200), "Start"));
+  auto &window{getWindow()};
+  float buttonSpacing{60.f};
+  float centerX = window.getSize().x / 2.f;
+  float centerY = window.getSize().y / 2.f;
+  sf::Vector2f ButtonSize(190.f, 49.f);
+  sf::Vector2f startButton(centerX - ButtonSize.x / 2.f,
+                           centerY - ButtonSize.y / 2.f - buttonSpacing);
+  sf::Vector2f settingsButton(centerX - ButtonSize.x / 2.f,
+                              centerY - ButtonSize.y / 2.f);
+  sf::Vector2f exitButton(centerX - ButtonSize.x / 2.f,
+                          centerY - ButtonSize.y / 2.f + buttonSpacing);
+  buttons.emplace(ButtonId::Start, interface::Button(startButton, "Start"));
   buttons.emplace(ButtonId::Settings,
-                  interface::Button(sf::Vector2f(0, 60), "Settings"));
-  buttons.emplace(ButtonId::Exit,
-                  interface::Button(sf::Vector2f(0, 120), "Exit"));
+                  interface::Button(settingsButton, "Settings"));
+  buttons.emplace(ButtonId::Exit, interface::Button(exitButton, "Exit"));
 
   buttons.at(ButtonId::Start).setActive(true);
 }
@@ -22,11 +32,29 @@ void Scene::handleEvents() {
       window.close();
     } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
       handleKeyEvent(keyPressed->scancode);
+    } else if (const auto *mouseButton =
+                   e->getIf<sf::Event::MouseButtonPressed>()) {
+      handleMouseEvent(mouseButton->button);
     }
   }
 }
 
-void Scene::update() {}
+void Scene::update() {
+  auto &window{getWindow()};
+  auto localpos = sf::Mouse::getPosition(window);
+  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
+                         static_cast<float>(localpos.y));
+
+  for (auto &button : buttons) {
+    if (button.second.getButtonBounds().contains(mousePosf)) {
+      m_activeButton = button.first;
+      button.second.setActive(true);
+    } else if (m_activeButton == button.first) {
+      button.second.setActive(false);
+      m_activeButton = ButtonId::None;
+    }
+  }
+}
 
 void Scene::draw() {
   auto &window{getWindow()};
@@ -38,9 +66,39 @@ void Scene::draw() {
   window.display();
 }
 
+void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
+  auto &window{getWindow()};
+  auto localpos = sf::Mouse::getPosition(window);
+  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
+                         static_cast<float>(localpos.y));
+  for (auto &button : buttons) {
+    if (button.second.getButtonBounds().contains(mousePosf)) {
+      if (m_activeButton == button.first) {
+        buttons.at(m_activeButton).setActive(false);
+        m_activeButton = button.first;
+        button.second.setActive(true);
+      }
+    } else {
+      button.second.setActive(false);
+    }
+  }
+  if (button == sf::Mouse::Button::Left) {
+    for (auto &button : buttons) {
+      if (button.second.getButtonBounds().contains(mousePosf)) {
+        if (button.first == ButtonId::Exit) {
+          window.close();
+        } else if (button.first == ButtonId::Settings) {
+          change(SceneId::Settings);
+        } else if (button.first == ButtonId::Start) {
+          change(SceneId::Lobby);
+        }
+      }
+    }
+  }
+}
+
 void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   auto &window{getWindow()};
-
   if (scancode == sf::Keyboard::Scancode::Escape) {
     window.close();
   } else if (scancode == sf::Keyboard::Scancode::Up) {
