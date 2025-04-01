@@ -32,7 +32,9 @@ void Button::setActive(bool active) {
                          : txtManager.at(resource::TextureId::BUTTON_INACTIVE);
   m_buttonSprite.setTexture(newTexture, true);
 }
-
+sf::FloatRect Button::getButtonBounds() const {
+  return m_buttonSprite.getGlobalBounds();
+}
 void Button::draw(sf::RenderTarget &target,
                   const sf::RenderStates states) const {
   sf::RenderStates localStates = states;
