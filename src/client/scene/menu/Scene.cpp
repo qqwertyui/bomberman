@@ -102,6 +102,7 @@ void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
 }
 
 void Scene::update() {
+  textBox.updateCursor();
   if (keyboardActive) {
     return;
   }

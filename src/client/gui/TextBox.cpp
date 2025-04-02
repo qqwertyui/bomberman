@@ -1,6 +1,5 @@
 #include "TextBox.hpp"
 #include "resource/FontManager.hpp"
-
 namespace bm::gui {
 TextBox::TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
                  const std::string &placeholder, unsigned int characterSize,

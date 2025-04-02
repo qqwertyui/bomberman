@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 
+
 namespace bm::scene::lobby {
 class Scene : public SceneBase {
 public:
