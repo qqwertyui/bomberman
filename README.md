@@ -16,5 +16,5 @@ cd /workspace && build/src/server/bomberman-server
 
 #### b) client
 ```
-cd /workspace && build/src/client/bomberman-client --serverPort 1111
+cd /workspace && build/src/client/bomberman-client
 ```
