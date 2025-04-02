@@ -1,9 +1,10 @@
 #pragma once
 #include "common/ConnectionManager.hpp"
-#include "interface/Button.hpp"
+#include "gui/Button.hpp"
 #include "scene/SceneBase.hpp"
 #include <map>
 #include <vector>
+
 
 namespace bm::scene::lobby {
 class Scene : public SceneBase {
@@ -21,7 +22,7 @@ private:
   void handleMouseEvent(const sf::Mouse::Button &button);
   common::ConnectionManager connMgr;
   std::vector<std::pair<int, int>> lobbyData;
-  std::map<int, interface::Button> lobbyButtons;
+  std::map<int, gui::Button> lobbyButtons;
   int x, y;
 };
 } // namespace bm::scene::lobby

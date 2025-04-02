@@ -2,7 +2,7 @@
 #include "resource/FontManager.hpp"
 #include "resource/TextureManager.hpp"
 
-namespace bm::interface {
+namespace bm::gui {
 Button::Button(const sf::Vector2f &position, const std::string &label,
                unsigned int characterSize)
     : m_buttonSprite{resource::TextureManager::get().at(
@@ -43,4 +43,4 @@ void Button::draw(sf::RenderTarget &target,
   target.draw(m_buttonSprite, localStates);
   target.draw(m_buttonLabel, localStates);
 }
-}; // namespace bm::interface
+}; // namespace bm::gui
