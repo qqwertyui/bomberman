@@ -17,14 +17,13 @@ private:
   void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
   void handleMouseEvent(const sf::Mouse::Button &button);
   enum class ButtonId : unsigned int {
-    Exit,
-    Settings,
     Start,
+    Settings,
+    Exit,
     NumberOfButtons,
-    None
   };
   ButtonId m_activeButton{ButtonId::Start};
   std::map<ButtonId, interface::Button> buttons;
+  bool keyboardActive{false};
 };
-
 } // namespace bm::scene::menu
