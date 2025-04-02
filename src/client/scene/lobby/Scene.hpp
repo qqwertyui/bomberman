@@ -24,5 +24,4 @@ private:
   std::map<int, interface::Button> lobbyButtons;
   int x, y;
 };
-
 } // namespace bm::scene::lobby
