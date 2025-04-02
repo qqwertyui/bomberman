@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 
 namespace bm::scene::menu {
-
 Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {
   auto &window{getWindow()};
   float buttonSpacing{60.f};
@@ -26,7 +25,6 @@ Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {
 
 void Scene::handleEvents() {
   auto &window{getWindow()};
-
   while (const auto &e = window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
       window.close();
@@ -39,63 +37,8 @@ void Scene::handleEvents() {
   }
 }
 
-void Scene::update() {
-  auto &window{getWindow()};
-  auto localpos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
-                         static_cast<float>(localpos.y));
-  for (auto &button : buttons) {
-    if (button.second.getButtonBounds().contains(mousePosf)) {
-      m_activeButton = button.first;
-      button.second.setActive(true);
-    } else if (m_activeButton == button.first) {
-      button.second.setActive(false);
-    }
-  }
-}
-
-void Scene::draw() {
-  auto &window{getWindow()};
-
-  window.clear(sf::Color::Red);
-  for (auto &button : buttons) {
-    window.draw(button.second);
-  }
-  window.display();
-}
-
-void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
-  auto &window{getWindow()};
-  auto localpos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
-                         static_cast<float>(localpos.y));
-  for (auto &button : buttons) {
-    if (button.second.getButtonBounds().contains(mousePosf)) {
-      if (m_activeButton == button.first) {
-        buttons.at(m_activeButton).setActive(false);
-        m_activeButton = button.first;
-        button.second.setActive(true);
-      }
-    } else {
-      button.second.setActive(false);
-    }
-  }
-  if (button == sf::Mouse::Button::Left) {
-    for (auto &button : buttons) {
-      if (button.second.getButtonBounds().contains(mousePosf)) {
-        if (button.first == ButtonId::Exit) {
-          window.close();
-        } else if (button.first == ButtonId::Settings) {
-          change(SceneId::Settings);
-        } else if (button.first == ButtonId::Start) {
-          change(SceneId::Lobby);
-        }
-      }
-    }
-  }
-}
-
 void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
+  keyboardActive = true;
   auto &window{getWindow()};
   if (scancode == sf::Keyboard::Scancode::Escape) {
     window.close();
@@ -105,6 +48,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
       m_activeButton =
           static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) - 1);
       buttons.at(m_activeButton).setActive(true);
+      keyboardActive = false;
     }
   } else if (scancode == sf::Keyboard::Scancode::Down) {
     if (m_activeButton < ButtonId::Exit) {
@@ -112,6 +56,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
       m_activeButton =
           static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) + 1);
       buttons.at(m_activeButton).setActive(true);
+      keyboardActive = false;
     }
   } else if (scancode == sf::Keyboard::Scancode::Enter) {
     if (m_activeButton == ButtonId::Exit) {
@@ -125,17 +70,16 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
 }
 
 void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
+  keyboardActive = false;
   auto &window{getWindow()};
   auto localpos = sf::Mouse::getPosition(window);
   sf::Vector2f mousePosf(static_cast<float>(localpos.x),
                          static_cast<float>(localpos.y));
   for (auto &button : buttons) {
     if (button.second.getButtonBounds().contains(mousePosf)) {
-      if (m_activeButton == button.first) {
-        buttons.at(m_activeButton).setActive(false);
-        m_activeButton = button.first;
-        button.second.setActive(true);
-      }
+      buttons.at(m_activeButton).setActive(false);
+      m_activeButton = button.first;
+      button.second.setActive(true);
     } else {
       button.second.setActive(false);
     }
@@ -153,5 +97,34 @@ void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
       }
     }
   }
+}
+
+void Scene::update() {
+  if (keyboardActive) {
+    return;
+  }
+  auto &window{getWindow()};
+  auto localpos = sf::Mouse::getPosition(window);
+  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
+                         static_cast<float>(localpos.y));
+  for (auto &button : buttons) {
+    if (button.second.getButtonBounds().contains(mousePosf)) {
+      if (m_activeButton != button.first) {
+        buttons.at(m_activeButton).setActive(false);
+        m_activeButton = button.first;
+        button.second.setActive(true);
+      }
+      return;
+    }
+  }
+}
+
+void Scene::draw() {
+  auto &window{getWindow()};
+  window.clear(sf::Color::Red);
+  for (auto &button : buttons) {
+    window.draw(button.second);
+  }
+  window.display();
 }
 } // namespace bm::scene::menu

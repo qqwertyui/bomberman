@@ -17,9 +17,9 @@ private:
   void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
   void handleMouseEvent(const sf::Mouse::Button &button);
   enum class ButtonId : unsigned int {
-    Exit,
-    Settings,
     Start,
+    Settings,
+    Exit,
     NumberOfButtons,
   };
   ButtonId m_activeButton{ButtonId::Start};
