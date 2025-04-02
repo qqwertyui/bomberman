@@ -10,7 +10,6 @@ Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {}
 
 void Scene::handleEvents() {
   auto &window{getWindow()};
-
   while (const auto &e = window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
       window.close();
@@ -37,7 +36,6 @@ void Scene::onEntry() {
   y = 10;
   connMgr.connect(GlobalConfig::get().serverIp(),
                   GlobalConfig::get().serverPort());
-
   common::itf::C2SMessage req;
   auto *query = req.mutable_query();
   query->set_lobbies(true);
@@ -58,12 +56,14 @@ void Scene::onEntry() {
     LOG_INF("No active lobbies");
     return;
   }
+
   lobbyData.clear();
   for (const auto &lobby : resp->query().lobbies()) {
     lobbyData.emplace_back(lobby.connectedplayers(), lobby.maxplayers());
   }
   createLobbyButton(lobbyData);
 }
+
 void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
   auto &window{getWindow()};
   auto localPos = sf::Mouse::getPosition(window);
@@ -77,6 +77,7 @@ void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
     }
   }
 }
+
 void Scene::createLobbyButton(
     const std::vector<std::pair<int, int>> &lobbyData) {
   auto &window{getWindow()};
@@ -101,6 +102,7 @@ void Scene::createLobbyButton(
     lobbyButtons.emplace(i, interface::Button(buttonPos, label));
   }
 }
+
 void Scene::onLeave() { connMgr.disconnect(); }
 
 void Scene::update() {
@@ -108,7 +110,6 @@ void Scene::update() {
   auto localPos = sf::Mouse::getPosition(window);
   sf::Vector2f mousePos(static_cast<float>(localPos.x),
                         static_cast<float>(localPos.y));
-
   for (auto &[index, lobbyButton] : lobbyButtons) {
     if (lobbyButton.getButtonBounds().contains(mousePos)) {
       lobbyButton.setActive(true);
@@ -120,12 +121,10 @@ void Scene::update() {
 
 void Scene::draw() {
   auto &window{getWindow()};
-
   window.clear(sf::Color::Blue);
   for (const auto &[index, lobbyButton] : lobbyButtons) {
     window.draw(lobbyButton);
   }
   window.display();
 }
-
 } // namespace bm::scene::lobby
