@@ -1,0 +1,24 @@
+name: Basic change validation
+
+on: 
+  push:
+  pull_request:
+  
+jobs:
+  basic-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        
+      - name: Setup execution environment
+        run: scripts/ci.sh setup
+
+      - name: Check formatting
+        run: scripts/ci.sh run format
+
+      - name: Build application
+        run: scripts/ci.sh run build
+
+      - name: Run unit tests
+        run: scripts/ci.sh run ut
