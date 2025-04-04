@@ -14,8 +14,8 @@ public:
   SceneBase(SceneManager &sceneManager);
   ~SceneBase();
 
-  virtual void onEntry(){};
-  virtual void onLeave(){};
+  virtual void onEntry() {};
+  virtual void onLeave() {};
 
   virtual void handleEvents() = 0;
   virtual void update() = 0;

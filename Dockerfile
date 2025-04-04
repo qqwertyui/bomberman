@@ -16,8 +16,3 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-dev \
     libegl1-mesa-dev \
     libfreetype-dev
-
-RUN mkdir /workspace
-WORKDIR /workspace
-
-ENTRYPOINT ["bash"]
