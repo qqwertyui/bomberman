@@ -1,6 +1,7 @@
 #pragma once
 
-#include "interface/Button.hpp"
+#include "gui/Button.hpp"
+#include "gui/TextBox.hpp"
 #include "scene/SceneBase.hpp"
 #include <map>
 
@@ -16,6 +17,7 @@ public:
 private:
   void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
   void handleMouseEvent(const sf::Mouse::Button &button);
+  gui::TextBox textBox;
   enum class ButtonId : unsigned int {
     Start,
     Settings,
@@ -23,7 +25,7 @@ private:
     NumberOfButtons,
   };
   ButtonId m_activeButton{ButtonId::Start};
-  std::map<ButtonId, interface::Button> buttons;
+  std::map<ButtonId, gui::Button> buttons;
   bool keyboardActive{false};
 };
 } // namespace bm::scene::menu

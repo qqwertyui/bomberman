@@ -3,7 +3,10 @@
 #include <SFML/Graphics.hpp>
 
 namespace bm::scene::menu {
-Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {
+Scene::Scene(SceneManager &sceneMgr)
+    : SceneBase(sceneMgr),
+      textBox({getWindow().getSize().x / 2.f - 200.f, 100.f}, {400.f, 50.f},
+              "Enter text ...", 30, 20) {
   auto &window{getWindow()};
   float buttonSpacing{60.f};
   float centerX = window.getSize().x / 2.f;
@@ -15,11 +18,9 @@ Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {
                               centerY - ButtonSize.y / 2.f);
   sf::Vector2f exitButton(centerX - ButtonSize.x / 2.f,
                           centerY - ButtonSize.y / 2.f + buttonSpacing);
-  buttons.emplace(ButtonId::Start, interface::Button(startButton, "Start"));
-  buttons.emplace(ButtonId::Settings,
-                  interface::Button(settingsButton, "Settings"));
-  buttons.emplace(ButtonId::Exit, interface::Button(exitButton, "Exit"));
-
+  buttons.emplace(ButtonId::Start, gui::Button(startButton, "Start"));
+  buttons.emplace(ButtonId::Settings, gui::Button(settingsButton, "Settings"));
+  buttons.emplace(ButtonId::Exit, gui::Button(exitButton, "Exit"));
   buttons.at(ButtonId::Start).setActive(true);
 }
 
@@ -34,6 +35,7 @@ void Scene::handleEvents() {
                    e->getIf<sf::Event::MouseButtonPressed>()) {
       handleMouseEvent(mouseButton->button);
     }
+    textBox.handleEvent(*e);
   }
 }
 
@@ -125,6 +127,7 @@ void Scene::draw() {
   for (auto &button : buttons) {
     window.draw(button.second);
   }
+  window.draw(textBox);
   window.display();
 }
 } // namespace bm::scene::menu
