@@ -3,6 +3,10 @@
 #include <SFML/Graphics.hpp>
 
 namespace bm::gui {
+constexpr int minPrintableAscii{32};
+constexpr int maxPrintableAscii{127};
+constexpr int backspaceAscii{8};
+
 class TextBox : public sf::Drawable, public sf::Transformable {
 public:
   TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
