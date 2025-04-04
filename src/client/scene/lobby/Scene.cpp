@@ -99,7 +99,7 @@ void Scene::createLobbyButton(
     int row = i % buttonInColumn;
     sf::Vector2f buttonPos(startX + column * (buttonSize.x + buttonSpacing),
                            startY + row * (buttonSize.y + buttonSpacing));
-    lobbyButtons.emplace(i, interface::Button(buttonPos, label));
+    lobbyButtons.emplace(i, gui::Button(buttonPos, label));
   }
 }
 
