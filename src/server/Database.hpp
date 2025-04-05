@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace bm::common {
-class ConnectionInfo;
+struct ConnectionInfo;
 }
 
 namespace bm {

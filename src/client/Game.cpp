@@ -49,7 +49,7 @@ int Game::run(int argc, char **argv) {
   }
 
   const auto frameTimeMs{
-      static_cast<unsigned int>(1.f / GlobalConfig::get().maxFps() * 1000)};
+      static_cast<int>(1.f / GlobalConfig::get().maxFps() * 1000)};
   sf::Clock clock;
   while (m_window->isOpen()) {
     handleEvents();
