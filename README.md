@@ -4,7 +4,7 @@ A work-in-progress, C++, SFML 3.0-based multiplayer implementation of popular bo
 ## 2. Build
 ```
 git clone git@github.com:qqwertyui/bomberman.git
-cd bomberman && bash docker.sh
+cd bomberman && bash scripts/dev.sh
 mkdir build && cd build && cmake .. && make
 ```
 
