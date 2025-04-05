@@ -17,8 +17,6 @@ TextBox::TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
   m_boxShape.setOutlineThickness(3.f);
   m_boxShape.setOutlineColor(sf::Color::Black);
 
-  auto &fontManager = resource::FontManager::get();
-
   m_text.setString("");
   m_text.setCharacterSize(characterSize);
   m_text.setFillColor(sf::Color::Black);

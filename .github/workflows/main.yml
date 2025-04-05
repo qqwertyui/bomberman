@@ -18,6 +18,9 @@ jobs:
 
       - name: Build application
         run: scripts/ci.sh run build
+      
+      - name: Run tidy checks
+        run: scripts/ci.sh run lint
 
       - name: Run unit tests
         run: scripts/ci.sh run ut

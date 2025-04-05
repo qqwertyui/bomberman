@@ -1,6 +1,6 @@
 #!/bin/bash
 
-configurationFile="$REPO_ROOT/.clang-format"
+configurationFile="$REPO_ROOT/src/.clang-format"
 filesToBeChecked=$(find "src" -type f \
   -name "*.c" -o \
   -name "*.cpp" -o \
