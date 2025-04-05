@@ -2,7 +2,6 @@ name: Basic change validation
 
 on: 
   push:
-  pull_request:
   
 jobs:
   basic-tests:
