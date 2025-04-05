@@ -5,14 +5,8 @@ set(
   "${CLIENT_DIR}/Game.cpp"
 )
 
-include(FetchContent)
-FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 3.0.0
-    GIT_SHALLOW ON
-)
-FetchContent_MakeAvailable(SFML)
-
+set(SFML_STATIC_LIBRARIES ON)
+find_package(SFML 3.0 COMPONENTS Graphics Window System Audio REQUIRED)
 
 include_directories(${CLIENT_DIR})
 
