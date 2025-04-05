@@ -21,14 +21,14 @@ public:
 
 private:
   bool m_isActive;
+  sf::Text m_text;
   std::size_t m_maxLength;
   sf::RectangleShape m_boxShape;
-  sf::Text m_text;
   sf::Text m_placeHolder;
   std::string m_inputText;
   sf::RectangleShape m_cursor;
   sf::Clock m_cursorClock;
-  std::size_t m_cursorPosition;
   bool m_cursorActive;
+  std::size_t m_cursorPosition;
 };
 } // namespace bm::gui

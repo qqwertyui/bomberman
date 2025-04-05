@@ -84,14 +84,13 @@ void Scene::createLobbyButton(
   float buttonSpacing{20.0f};
   sf::Vector2f buttonSize{190.0f, 49.0f};
   float centerY = window.getSize().y / 2.0f;
-  float centerX = window.getSize().x / 2.0f;
   int buttonInColumn{4};
   float totalColumnHeight =
       buttonInColumn * buttonSize.y + (buttonInColumn - 1) * buttonSpacing;
   float startX = buttonSpacing;
   float startY = centerY - totalColumnHeight / 2.0f;
   lobbyButtons.clear();
-  for (int i = 0; i < lobbyData.size(); i++) {
+  for (unsigned int i = 0; i < lobbyData.size(); i++) {
     const auto &[connected, max] = lobbyData[i];
     std::string label =
         std::to_string(connected) + "/" + std::to_string(max) + " players";

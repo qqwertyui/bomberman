@@ -13,7 +13,6 @@ Button::Button(const sf::Vector2f &position, const std::string &label,
   m_buttonSprite.setPosition(position);
   auto buttonSize = m_buttonSprite.getTexture().getSize();
 
-  auto &fontManager = resource::FontManager::get();
   m_buttonLabel.setString(label);
   m_buttonLabel.setCharacterSize(characterSize);
 

@@ -12,7 +12,7 @@ class SceneManager;
 class SceneBase {
 public:
   SceneBase(SceneManager &sceneManager);
-  ~SceneBase();
+  virtual ~SceneBase();
 
   virtual void onEntry() {};
   virtual void onLeave() {};
