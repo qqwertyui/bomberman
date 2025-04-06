@@ -39,7 +39,6 @@ public:
 
   void disconnect() {
     if (not isConnected()) {
-      LOG_WRN("Connection already closed");
       return;
     }
     ::closeConnection(info->fd);
