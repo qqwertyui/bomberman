@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y \
     git wget unzip \
     gcc g++ cmake make \
     xz-utils clang-format \
-    clang-tidy
+    clang-tidy nano
 
 # install protobuf
 RUN apt-get install -y \

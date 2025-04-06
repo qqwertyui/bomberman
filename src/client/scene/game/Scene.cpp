@@ -22,23 +22,27 @@ struct Scene::impl {
 
   void handleKeyPressed(const sf::Keyboard::Scancode &scancode);
   void handleKeyReleased(const sf::Keyboard::Scancode &scancode);
-  void updateVelocity(const sf::Keyboard::Scancode &scancode, float velocity);
+  sf::Vector2f calculateVelocity();
 
-  std::optional<sf::Vector2f> calculatePlayerPosition();
-  void sendServerUpdate(const sf::Vector2f &coordinates);
+  sf::Vector2f calculatePlayerPosition(sf::Vector2f oldVelocity,
+                                       sf::Vector2f newVelocity);
+  void sendServerUpdate(const sf::Vector2i &coordinates);
 
   Scene *base;
 
   sf::CircleShape circle;
-  sf::Vector2f position;
+  sf::Vector2f positionFloat;
+  sf::Vector2i positionInt;
+
   sf::Vector2f velocity;
   sf::Clock updateTime;
+
   common::ConnectionManager connMgr;
 
   static void messageReceiverLoop(common::ConnectionManager *connMgr);
   std::thread serverMessageHandler;
 
-  static constexpr float pixelsPerSecond{300};
+  static constexpr float pixelsPerSecond{120};
 };
 
 Scene::impl::impl(Scene *base) : base(base) {
@@ -49,8 +53,10 @@ Scene::impl::impl(Scene *base) : base(base) {
   const auto radius{circle.getRadius()};
   circle.setOrigin(sf::Vector2f(radius, radius));
 
-  position = sf::Vector2f{radius, radius};
-  circle.setPosition(position);
+  positionFloat = sf::Vector2f{radius, radius};
+  positionInt =
+      sf::Vector2i{static_cast<int>(radius), static_cast<int>(radius)};
+  circle.setPosition(positionFloat);
 
   velocity = {0.f, 0.f};
 }
@@ -69,15 +75,17 @@ void Scene::impl::messageReceiverLoop(common::ConnectionManager *connMgr) {
                    resp->update().game().ispositionok()};
     LOG_DBG(ack ? "ack" : "nack");
   }
-
-  connMgr->disconnect();
 }
 
 void Scene::impl::onEntry() {
   serverMessageHandler = std::thread{messageReceiverLoop, &connMgr};
+  updateTime.restart();
 }
 
-void Scene::impl::onLeave() { serverMessageHandler.join(); }
+void Scene::impl::onLeave() {
+  connMgr.disconnect();
+  serverMessageHandler.join();
+}
 
 void Scene::impl::handleEvents() {
   auto &window{base->getWindow()};
@@ -94,35 +102,37 @@ void Scene::impl::handleEvents() {
 }
 
 void Scene::impl::handleKeyPressed(const sf::Keyboard::Scancode &scancode) {
-  auto &window{base->getWindow()};
   if (scancode == sf::Keyboard::Scancode::Escape) {
-    window.close();
+    base->change(SceneId::Lobby);
     return;
   }
-
-  constexpr float normalVelocity{1.f};
-  updateVelocity(scancode, normalVelocity);
 }
 
-void Scene::impl::handleKeyReleased(const sf::Keyboard::Scancode &scancode) {
-  constexpr float zeroVelocity{0.f};
-  updateVelocity(scancode, zeroVelocity);
+void Scene::impl::handleKeyReleased(
+    [[maybe_unused]] const sf::Keyboard::Scancode &scancode) {
+  //
 }
 
-void Scene::impl::updateVelocity(const sf::Keyboard::Scancode &scancode,
-                                 float velocity) {
-  if (scancode == sf::Keyboard::Scancode::Up) {
-    this->velocity.y = -velocity;
-  } else if (scancode == sf::Keyboard::Scancode::Down) {
-    this->velocity.y = velocity;
-  } else if (scancode == sf::Keyboard::Scancode::Right) {
-    this->velocity.x = velocity;
-  } else if (scancode == sf::Keyboard::Scancode::Left) {
-    this->velocity.x = -velocity;
+sf::Vector2f Scene::impl::calculateVelocity() {
+  constexpr float unit{1.f};
+
+  auto velocity{sf::Vector2f{}};
+  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up)) {
+    velocity.y -= unit;
   }
+  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down)) {
+    velocity.y += unit;
+  }
+  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left)) {
+    velocity.x -= unit;
+  }
+  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Right)) {
+    velocity.x += unit;
+  }
+  return velocity;
 }
 
-void Scene::impl::sendServerUpdate(const sf::Vector2f &coordinates) {
+void Scene::impl::sendServerUpdate(const sf::Vector2i &coordinates) {
   common::itf::C2SMessage req;
   auto *update = req.mutable_update();
   auto *game = update->mutable_game();
@@ -131,38 +141,54 @@ void Scene::impl::sendServerUpdate(const sf::Vector2f &coordinates) {
   position->set_y(coordinates.y);
 
   if (not connMgr.send(req)) {
-    LOG_ERR("Connection closed");
     base->change(SceneId::Menu);
     return;
   }
 }
 
-std::optional<sf::Vector2f> Scene::impl::calculatePlayerPosition() {
-  if (velocity == sf::Vector2f{0.f, 0.f}) {
-    return std::nullopt;
+sf::Vector2f Scene::impl::calculatePlayerPosition(sf::Vector2f oldVelocity,
+                                                  sf::Vector2f newVelocity) {
+  if (newVelocity == sf::Vector2f{0.f, 0.f}) {
+    return positionFloat;
   }
-  constexpr float pixelsPerMs{pixelsPerSecond / 1000};
-  unsigned int msSinceLastUpdate = updateTime.getElapsedTime().asMilliseconds();
-  float pixelsMoved = msSinceLastUpdate * pixelsPerMs;
+  constexpr float pixelsPerUs{pixelsPerSecond / 1'000'000};
+  float usSinceLastUpdate = updateTime.getElapsedTime().asMicroseconds();
+  float distanceInPixels = usSinceLastUpdate * pixelsPerUs;
 
   const auto &mapSize{base->getWindow().getSize()};
-  const auto halfSize{circle.getRadius()};
+  const auto halfPlayerModelSize{
+      sf::Vector2f{circle.getRadius(), circle.getRadius()}};
 
-  sf::Vector2f coords{position.x, position.y};
-  coords.x = std::clamp(coords.x + (velocity.x * pixelsMoved), halfSize,
-                        mapSize.x - halfSize);
-  coords.y = std::clamp(coords.y + (velocity.y * pixelsMoved), halfSize,
-                        mapSize.y - halfSize);
-
-  return (coords == position) ? std::nullopt : std::make_optional(coords);
+  auto position{positionFloat};
+  if (oldVelocity.x == newVelocity.x) {
+    float direction{newVelocity.x};
+    position.x =
+        std::clamp(position.x + (direction * distanceInPixels),
+                   halfPlayerModelSize.x, mapSize.x - halfPlayerModelSize.x);
+  }
+  if (oldVelocity.y == newVelocity.y) {
+    float direction{newVelocity.y};
+    position.y =
+        std::clamp(position.y + (direction * distanceInPixels),
+                   halfPlayerModelSize.y, mapSize.y - halfPlayerModelSize.y);
+  }
+  return position;
 }
 
 void Scene::impl::update() {
-  auto coords = calculatePlayerPosition();
-  if (coords) {
-    this->position = *coords;
-    circle.setPosition(*coords);
-    sendServerUpdate(*coords);
+  auto newVelocity = calculateVelocity();
+  auto oldVelocity = this->velocity;
+  this->velocity = newVelocity;
+
+  positionFloat = calculatePlayerPosition(oldVelocity, newVelocity);
+  auto newPositionInt = sf::Vector2i{static_cast<int>(positionFloat.x),
+                                     static_cast<int>(positionFloat.y)};
+
+  if (positionInt != newPositionInt) {
+    positionInt = newPositionInt;
+
+    circle.setPosition(positionFloat);
+    sendServerUpdate(positionInt);
   }
 
   updateTime.restart();
