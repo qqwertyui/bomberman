@@ -56,7 +56,8 @@ void TextBox::handleEvent(const sf::Event &e) {
           m_cursorPosition++;
           m_text.setString(m_inputText);
         }
-      } else if (textEntered->unicode == backspaceAscii) {
+      } else if (textEntered->unicode == backspaceAscii &&
+                 m_cursorPosition > 0) {
         if (!m_inputText.empty()) {
           m_inputText.erase(m_cursorPosition - 1, 1);
           m_cursorPosition--;
