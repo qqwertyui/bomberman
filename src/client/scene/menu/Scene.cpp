@@ -128,6 +128,5 @@ void Scene::draw() {
     window.draw(button.second);
   }
   window.draw(textBox);
-  window.display();
 }
 } // namespace bm::scene::menu

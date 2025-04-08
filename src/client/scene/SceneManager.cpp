@@ -1,14 +1,22 @@
 #include "SceneManager.hpp"
+#include "client/GlobalConfig.hpp"
 #include "common/Log.hpp"
 #include "game/Scene.hpp"
 #include "lobby/Scene.hpp"
 #include "menu/Scene.hpp"
+#include "resource/FontManager.hpp"
 #include "settings/Scene.hpp"
 #include <SFML/Graphics.hpp>
 #include <cassert>
 
 namespace bm::scene {
-SceneManager::SceneManager(sf::RenderWindow &window) : window(window) {
+SceneManager::SceneManager(sf::RenderWindow &window)
+    : window(window),
+      fpsText(resource::FontManager::get().at(resource::FontId::MENU)) {
+  fpsText.setCharacterSize(30);
+  fpsText.setFillColor(sf::Color::Cyan);
+  fpsText.setPosition(sf::Vector2f(30, 30));
+  fpsText.setString("FPS: " + std::to_string(0));
   add(SceneId::Menu, new menu::Scene(*this));
   add(SceneId::Settings, new settings::Scene(*this));
   add(SceneId::Lobby, new lobby::Scene(*this));
@@ -61,11 +69,28 @@ SceneBase &SceneManager::getActive() {
   return *active;
 }
 
+void SceneManager::drawFps() {
+  frameCount++;
+  elapsedTime += fpsClock.restart().asSeconds();
+  if (elapsedTime >= 1.0f) {
+    fpsText.setString("FPS: " + std::to_string(frameCount));
+    frameCount = 0;
+    elapsedTime = 0.0f;
+  }
+  window.draw(fpsText);
+}
+
 void SceneManager::handleEvents() { getActive().handleEvents(); }
 
 void SceneManager::update() { getActive().update(); }
 
-void SceneManager::draw() { getActive().draw(); }
+void SceneManager::draw() {
+  getActive().draw();
+  if (GlobalConfig::get().showFps()) {
+    drawFps();
+  }
+  window.display();
+}
 
 sf::RenderWindow &SceneManager::getWindow() { return window; }
 
