@@ -19,9 +19,13 @@ public:
 private:
   void createLobbyButton(const std::vector<std::pair<int, int>> &lobbyData);
   void handleMouseEvent(const sf::Mouse::Button &button);
+  void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
   common::ConnectionManager connMgr;
   std::vector<std::pair<int, int>> lobbyData;
   std::map<int, gui::Button> lobbyButtons;
+  bool keyboardActive{true};
+  int activeLobbyButton{0};
+  int buttonInColumn{4};
   int x, y;
 };
 } // namespace bm::scene::lobby
