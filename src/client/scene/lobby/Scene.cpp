@@ -124,6 +124,5 @@ void Scene::draw() {
   for (const auto &[index, lobbyButton] : lobbyButtons) {
     window.draw(lobbyButton);
   }
-  window.display();
 }
 } // namespace bm::scene::lobby
