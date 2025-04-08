@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SFML/Graphics/Text.hpp"
+#include "SFML/System/Clock.hpp"
 #include "SceneId.hpp"
 #include <map>
 
@@ -32,6 +34,11 @@ private:
   std::map<SceneId, SceneBase *> scenes{};
   SceneBase *active{nullptr};
   sf::RenderWindow &window;
+  void drawFps();
+  sf::Clock fpsClock;
+  sf::Text fpsText;
+  unsigned int frameCount{0};
+  float elapsedTime{0.0f};
 };
 
 } // namespace bm::scene
