@@ -38,7 +38,6 @@ private:
   sf::Clock fpsClock;
   sf::Text fpsText;
   unsigned int frameCount{0};
-  float elapsedTime{0.0f};
 };
 
 } // namespace bm::scene
