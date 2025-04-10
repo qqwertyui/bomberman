@@ -71,11 +71,10 @@ SceneBase &SceneManager::getActive() {
 
 void SceneManager::drawFps() {
   frameCount++;
-  elapsedTime += fpsClock.restart().asSeconds();
-  if (elapsedTime >= 1.0f) {
+  if (fpsClock.getElapsedTime().asSeconds() > 1.f) {
     fpsText.setString("FPS: " + std::to_string(frameCount));
+    fpsClock.restart();
     frameCount = 0;
-    elapsedTime = 0.0f;
   }
   window.draw(fpsText);
 }

@@ -26,6 +26,5 @@ private:
   bool keyboardActive{true};
   int activeLobbyButton{0};
   int buttonInColumn{4};
-  int x, y;
 };
 } // namespace bm::scene::lobby
