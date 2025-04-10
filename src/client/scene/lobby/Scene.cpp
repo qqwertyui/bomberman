@@ -23,8 +23,6 @@ void Scene::handleEvents() {
 }
 
 void Scene::onEntry() {
-  x = 10;
-  y = 10;
   connMgr.connect(GlobalConfig::get().serverIp(),
                   GlobalConfig::get().serverPort());
   common::itf::C2SMessage req;
@@ -96,10 +94,6 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
       activeLobbyButton += buttonInColumn;
     }
   } else if (scancode == sf::Keyboard::Scancode::Enter) {
-    // LOG_DBG("Sending query");
-    // common::itf::C2SMessage msg;
-    // msg.mutable_query()->set_version(true);
-    // connMgr.send(msg);
     change(SceneId::Game);
   } else if (scancode == sf::Keyboard::Scancode::Escape) {
     change(SceneId::Menu);
