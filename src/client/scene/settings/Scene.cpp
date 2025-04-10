@@ -27,7 +27,6 @@ void Scene::draw() {
   auto &window{getWindow()};
 
   window.clear(sf::Color::Green);
-  window.display();
 }
 
 } // namespace bm::scene::settings

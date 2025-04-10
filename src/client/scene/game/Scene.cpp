@@ -84,7 +84,6 @@ void Scene::impl::draw() {
 
   window.clear(sf::Color::Cyan);
   window.draw(*player);
-  window.display();
 }
 
 Scene::Scene(SceneManager &sceneMgr)

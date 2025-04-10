@@ -48,15 +48,19 @@ int Game::run(int argc, char **argv) {
     return 1;
   }
 
-  const auto frameTimeMs{
-      static_cast<int>(1.f / GlobalConfig::get().maxFps() * 1000)};
+  const auto frameTime = sf::seconds(1.f / GlobalConfig::get().maxFps());
   sf::Clock clock;
+  sf::Time timeSinceLastFrame = sf::Time::Zero;
+
   while (m_window->isOpen()) {
+    timeSinceLastFrame += clock.restart();
+
     handleEvents();
     update();
-    if (clock.getElapsedTime().asMilliseconds() > frameTimeMs) {
+
+    if (timeSinceLastFrame >= frameTime) {
       draw();
-      clock.restart();
+      timeSinceLastFrame -= frameTime;
     }
   }
   return 0;
