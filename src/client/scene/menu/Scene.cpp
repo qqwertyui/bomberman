@@ -6,7 +6,8 @@ namespace bm::scene::menu {
 Scene::Scene(SceneManager &sceneMgr)
     : SceneBase(sceneMgr),
       textBox({getWindow().getSize().x / 2.f - 200.f, 100.f}, {400.f, 50.f},
-              "Enter text ...", 30, 20) {
+              "Enter text ...", 30, 20),
+      fpsCheckbox({60.f, 60.f}, {30.f, 30.f}) {
   auto &window{getWindow()};
   float buttonSpacing{60.f};
   float centerX = window.getSize().x / 2.f;
@@ -36,6 +37,7 @@ void Scene::handleEvents() {
       handleMouseEvent(mouseButton->button);
     }
     textBox.handleEvent(*e);
+    fpsCheckbox.handleEvent(*e);
   }
 }
 
@@ -128,5 +130,6 @@ void Scene::draw() {
     window.draw(button.second);
   }
   window.draw(textBox);
+  window.draw(fpsCheckbox);
 }
 } // namespace bm::scene::menu
