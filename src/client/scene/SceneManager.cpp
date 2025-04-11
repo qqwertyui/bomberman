@@ -79,13 +79,15 @@ void SceneManager::drawFps() {
   window.draw(fpsText);
 }
 
+void SceneManager::setFpsVisible(bool value) { showFps = value; }
+
 void SceneManager::handleEvents() { getActive().handleEvents(); }
 
 void SceneManager::update() { getActive().update(); }
 
 void SceneManager::draw() {
   getActive().draw();
-  if (GlobalConfig::get().showFps()) {
+  if (showFps) {
     drawFps();
   }
   window.display();

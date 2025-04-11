@@ -24,6 +24,7 @@ public:
   void handleEvents();
   void update();
   void draw();
+  void setFpsVisible(bool value);
 
   sf::RenderWindow &getWindow();
 
@@ -36,6 +37,7 @@ private:
   sf::RenderWindow &window;
   void drawFps();
   sf::Clock fpsClock;
+  bool showFps{false};
   sf::Text fpsText;
   unsigned int frameCount{0};
 };
