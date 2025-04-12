@@ -22,7 +22,7 @@ public:
   unsigned int getNumberOfLobbies() const;
 
   Client *getPlayerById(unsigned int id);
-  Client *addPlayer(const common::ConnectionInfo &connection);
+  std::pair<int, Client *> addPlayer(const common::ConnectionInfo &connection);
   void removePlayer(unsigned int id);
 
   bool playerLimitReached() const;

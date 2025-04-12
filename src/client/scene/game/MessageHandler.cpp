@@ -47,16 +47,41 @@ bool MessageHandler::push(MessageHandler::Buffer &buffer,
   return true;
 }
 
+void MessageHandler::handleQuery(
+    [[maybe_unused]] const common::itf::QueryResp &msg) {
+  //
+}
+
+void MessageHandler::handleUpdate(const common::itf::UpdateResp &msg) {
+  const bool ack{msg.has_game() and msg.game().has_ispositionok() and
+                 msg.game().ispositionok()};
+  LOG_DBG(ack ? "ack" : "nack");
+}
+
+void MessageHandler::handleInd(
+    [[maybe_unused]] const common::itf::UpdateInd &msg) {
+  //
+}
+
+void MessageHandler::handleMessage(const common::itf::S2CMessage &msg) {
+  if (msg.has_query()) {
+    handleQuery(msg.query());
+  }
+  if (msg.has_update()) {
+    handleUpdate(msg.update());
+  }
+  if (msg.has_ind()) {
+    handleInd(msg.ind());
+  }
+}
+
 void MessageHandler::handle() {
   auto &buffer{getPassiveBuffer()};
   std::span<common::itf::S2CMessage> messages{
       buffer.elements.data(), buffer.elements.data() + buffer.size};
 
-  for (auto &msg : messages) {
-    const bool ack{msg.has_update() and msg.update().has_game() and
-                   msg.update().game().has_ispositionok() and
-                   msg.update().game().ispositionok()};
-    LOG_DBG(ack ? "ack" : "nack");
+  for (const auto &msg : messages) {
+    handleMessage(msg);
   }
 
   buffer.size = 0;

@@ -16,6 +16,8 @@ public:
 
   bool isConnected() const { return info.has_value(); }
 
+  std::optional<ConnectionInfo> getConnectionInfo() { return info; }
+
   void connect(const std::string &ip, const uint16_t port) {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd == -1) {

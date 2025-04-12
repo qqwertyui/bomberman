@@ -1,30 +1,38 @@
 #pragma once
 
-#include "common/ConnectionInfo.hpp"
+#include "common/ConnectionManager.hpp"
+#include "common/itf/core.pb.h"
 #include <optional>
 #include <string>
 
-namespace bm::common::itf {
-class S2CMessage;
-class C2SMessage;
-} // namespace bm::common::itf
+namespace bm::common {
+struct ConnectionInfo;
+}
 
 namespace bm {
 class Client {
 public:
-  Client(common::ConnectionInfo connection, unsigned int id);
-
-  unsigned int getId() const;
-  common::ConnectionInfo getConnection() const;
+  Client(const common::ConnectionInfo &info);
 
   void onConnect();
+  std::optional<common::itf::C2SMessage> tryReceive();
   std::optional<common::itf::S2CMessage>
-  onReceive(const common::itf::C2SMessage &req);
+  onReceive(const common::itf::C2SMessage &msg);
+  void onSend(common::itf::S2CMessage &msg);
   void onDisconnect();
 
 private:
-  common::ConnectionInfo connection;
-  unsigned int id;
+  bool handleMessage(const common::itf::C2SMessage &req,
+                     common::itf::S2CMessage &resp);
+  void handleQuery(const common::itf::QueryReq &req,
+                   common::itf::QueryResp &resp);
+  void handleUpdate(const common::itf::UpdateReq &req,
+                    common::itf::UpdateResp &resp);
+  void handleGameUpdate(const common::itf::UpdateGameReq &req,
+                        common::itf::UpdateGameResp &resp);
+
+  common::ConnectionManager connMgr;
+  bool shouldExit{false};
 };
 
 } // namespace bm
