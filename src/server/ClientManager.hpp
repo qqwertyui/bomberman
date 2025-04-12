@@ -12,7 +12,7 @@ public:
   static void run();
 
 private:
-  static void handleNewConnection(Client *client);
+  static void newClientThreadMain(const common::ConnectionInfo &info);
 };
 
 } // namespace bm

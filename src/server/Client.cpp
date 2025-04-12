@@ -3,17 +3,52 @@
 #include "Database.hpp"
 #include "GlobalConfig.hpp"
 #include "Lobby.hpp"
+#include "common/ConnectionInfo.hpp"
 #include "common/Log.hpp"
 #include "common/itf/core.pb.h"
+#include <cassert>
 
 namespace bm {
-Client::Client(common::ConnectionInfo connection, unsigned int id)
-    : connection(connection), id(id) {}
+Client::Client(const common::ConnectionInfo &info) : connMgr{info} {}
 
-unsigned int Client::getId() const { return id; }
+void Client::onConnect() {
+  auto info{connMgr.getConnectionInfo()};
+  assert(info.has_value());
 
-void handleQuery(const common::itf::QueryReq &req,
-                 common::itf::QueryResp &resp) {
+  LOG_DBG("[+] New connection from %s:%u", info->ip.c_str(), info->port);
+}
+
+std::optional<common::itf::C2SMessage> Client::tryReceive() {
+  if (shouldExit) {
+    return std::nullopt;
+  }
+  return connMgr.receive<common::itf::C2SMessage>();
+}
+
+std::optional<common::itf::S2CMessage>
+Client::onReceive(const common::itf::C2SMessage &req) {
+  common::itf::S2CMessage resp;
+  if (not handleMessage(req, resp)) {
+    return std::nullopt;
+  }
+  return resp;
+}
+
+bool Client::handleMessage(const common::itf::C2SMessage &req,
+                           common::itf::S2CMessage &resp) {
+  if (req.has_query()) {
+    handleQuery(req.query(), *resp.mutable_query());
+  }
+  if (req.has_update()) {
+    handleUpdate(req.update(), *resp.mutable_update());
+  }
+
+  const bool isResponseNeeded{resp.has_query() or resp.has_update()};
+  return isResponseNeeded;
+}
+
+void Client::handleQuery(const common::itf::QueryReq &req,
+                         common::itf::QueryResp &resp) {
   if (req.has_version()) {
     resp.set_version(GlobalConfig::get().version());
   }
@@ -30,17 +65,8 @@ void handleQuery(const common::itf::QueryReq &req,
   }
 }
 
-void handleGameUpdate(const common::itf::UpdateGameReq &req,
-                      common::itf::UpdateGameResp &resp) {
-  if (req.has_position()) {
-    [[maybe_unused]] const int x{req.position().x()};
-    [[maybe_unused]] const int y{req.position().y()};
-    resp.set_ispositionok(true);
-  }
-}
-
-void handleUpdate(const common::itf::UpdateReq &req,
-                  common::itf::UpdateResp &resp) {
+void Client::handleUpdate(const common::itf::UpdateReq &req,
+                          common::itf::UpdateResp &resp) {
   if (req.has_lobby()) {
   }
   if (req.has_game()) {
@@ -48,37 +74,23 @@ void handleUpdate(const common::itf::UpdateReq &req,
   }
 }
 
-bool handleMessage(const common::itf::C2SMessage &req,
-                   common::itf::S2CMessage &resp) {
-  if (req.has_query()) {
-    handleQuery(req.query(), *resp.mutable_query());
+void Client::handleGameUpdate(const common::itf::UpdateGameReq &req,
+                              common::itf::UpdateGameResp &resp) {
+  if (req.has_position()) {
+    [[maybe_unused]] const int x{req.position().x()};
+    [[maybe_unused]] const int y{req.position().y()};
+    resp.set_ispositionok(true);
   }
-  if (req.has_update()) {
-    handleUpdate(req.update(), *resp.mutable_update());
-  }
-
-  return true;
 }
 
-common::ConnectionInfo Client::getConnection() const { return connection; }
-
-void Client::onConnect() {
-  LOG_DBG("[+] New connection from %s:%u", connection.ip.c_str(),
-          connection.port);
-}
-
-std::optional<common::itf::S2CMessage>
-Client::onReceive(const common::itf::C2SMessage &req) {
-  common::itf::S2CMessage resp;
-  if (not handleMessage(req, resp)) {
-    return std::nullopt;
-  }
-  return resp;
-}
+void Client::onSend(common::itf::S2CMessage &msg) { connMgr.send(msg); }
 
 void Client::onDisconnect() {
-  LOG_DBG("[-] Disconnected from %s:%u", connection.ip.c_str(),
-          connection.port);
+  auto info{connMgr.getConnectionInfo()};
+  assert(info.has_value());
+
+  connMgr.disconnect();
+  LOG_DBG("[-] Disconnected from %s:%u", info->ip.c_str(), info->port);
 }
 
 } // namespace bm

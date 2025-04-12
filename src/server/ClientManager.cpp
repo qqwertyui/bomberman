@@ -3,7 +3,6 @@
 #include "Client.hpp"
 #include "Database.hpp"
 #include "GlobalConfig.hpp"
-#include "common/ConnectionManager.hpp"
 #include "common/Log.hpp"
 #include "common/Networking.hpp"
 #include "common/itf/core.pb.h"
@@ -71,32 +70,29 @@ void ClientManager::run() {
       LOG_ERR("Couldn't accept new connection: %s", strerror(errno));
       continue;
     }
-    auto *client = db.addPlayer(*info);
-    if (not client) {
-      LOG_ERR("Couldn't add new player");
-      continue;
-    }
-    std::thread{handleNewConnection, client}.detach();
+    std::thread{newClientThreadMain, *info}.detach();
   }
   close(*fd);
 }
 
-void ClientManager::handleNewConnection(Client *client) {
-  common::ConnectionManager connMgr{client->getConnection()};
+void ClientManager::newClientThreadMain(const common::ConnectionInfo &info) {
+  auto [id, client] = Database::get().addPlayer(info);
+  if (not client) {
+    LOG_ERR("Couldn't add new player");
+    return;
+  }
   client->onConnect();
 
-  while (auto req = connMgr.receive<common::itf::C2SMessage>()) {
+  while (auto req = client->tryReceive()) {
     auto resp = client->onReceive(req.value());
     if (not resp) {
       continue;
     }
-    connMgr.send(resp.value());
+    client->onSend(resp.value());
   }
 
-  connMgr.disconnect();
   client->onDisconnect();
-
-  Database::get().removePlayer(client->getId());
+  Database::get().removePlayer(id);
 }
 
 } // namespace bm

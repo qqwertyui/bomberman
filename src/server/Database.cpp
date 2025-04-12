@@ -6,7 +6,6 @@
 #include "common/Log.hpp"
 #include "common/Utils.hpp"
 #include <cassert>
-#include <mutex>
 
 namespace bm {
 bool Database::create(unsigned int maxLobbies, unsigned int maxPlayers) {
@@ -28,7 +27,7 @@ Database::Database(unsigned int maxLobbies, unsigned int maxPlayers)
 
   players.reserve(maxPlayers);
   for (unsigned int i = 0; i < maxPlayers; i++) {
-    players.emplace_back(std::make_pair(Client{{}, i}, false));
+    players.emplace_back(std::make_pair(Client{{}}, false));
   }
 }
 
@@ -62,20 +61,21 @@ std::optional<unsigned int> Database::findFreePlayerEntryId() {
   return std::nullopt;
 }
 
-Client *Database::addPlayer(const common::ConnectionInfo &connection) {
+std::pair<int, Client *>
+Database::addPlayer(const common::ConnectionInfo &connection) {
   std::lock_guard<std::mutex> guard(mtx);
   if (connectedCounter >= maxPlayers) {
-    return nullptr;
+    return std::make_pair(0, nullptr);
   }
   auto id = findFreePlayerEntryId();
   if (not id) {
-    return nullptr;
+    return std::make_pair(0, nullptr);
   }
   auto &player = players[*id];
   player.second = true;
-  player.first = {connection, *id};
+  player.first = {connection};
   connectedCounter++;
-  return &player.first;
+  return std::make_pair(*id, &player.first);
 }
 
 void Database::removePlayer(unsigned int id) {

@@ -17,6 +17,11 @@ public:
   bool send(common::itf::C2SMessage &req);
 
 private:
+  void handleMessage(const common::itf::S2CMessage &msg);
+  void handleQuery(const common::itf::QueryResp &msg);
+  void handleUpdate(const common::itf::UpdateResp &msg);
+  void handleInd(const common::itf::UpdateInd &msg);
+
   static void threadMainLoop(MessageHandler *self);
 
   static constexpr unsigned int queueSize{100};
