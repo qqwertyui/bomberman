@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SFML/Graphics/Text.hpp"
-#include "SFML/System/Clock.hpp"
 #include "SceneId.hpp"
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/System/Clock.hpp>
 #include <map>
 
 namespace sf {
@@ -31,11 +31,10 @@ public:
 private:
   SceneBase *getSceneById(const SceneId &sceneId);
   SceneBase &getActive();
-
+  void drawFps();
   std::map<SceneId, SceneBase *> scenes{};
   SceneBase *active{nullptr};
   sf::RenderWindow &window;
-  void drawFps();
   sf::Clock fpsClock;
   bool showFps{false};
   sf::Text fpsText;
