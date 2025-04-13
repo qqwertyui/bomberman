@@ -18,7 +18,7 @@ public:
 
 private:
   void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
-  void handleMouseEvent(const sf::Mouse::Button &button);
+  void handleMouseClick(const sf::Mouse::Button &button);
   gui::TextBox textBox;
   gui::Checkbox fpsCheckbox;
   enum class ButtonId : unsigned int {

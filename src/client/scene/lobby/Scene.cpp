@@ -17,7 +17,7 @@ void Scene::handleEvents() {
       handleKeyEvent(keyPressed->scancode);
     } else if (const auto *mouseButton =
                    e->getIf<sf::Event::MouseButtonPressed>()) {
-      handleMouseEvent(mouseButton->button);
+      handleMouseClick(mouseButton->button);
     }
   }
 }
@@ -53,7 +53,7 @@ void Scene::onEntry() {
   createLobbyButton(lobbyData);
 }
 
-void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
+void Scene::handleMouseClick(const sf::Mouse::Button &button) {
   keyboardActive = false;
   auto &window{getWindow()};
   auto localPos = sf::Mouse::getPosition(window);
