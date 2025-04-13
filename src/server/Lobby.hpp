@@ -3,20 +3,23 @@
 #include <vector>
 
 namespace bm {
-class Client;
-
 class Lobby {
 public:
   Lobby(unsigned int id);
 
   unsigned int getId() const;
-  const std::vector<Client *> &getMembers() const;
+  bool add(int playerId);
+  bool remove(int playerId);
+  std::vector<int> getMembersIds() const;
+
+  bool isFull() const;
+  bool isEmpty() const;
   unsigned int getMaxSize() const;
 
 private:
   const unsigned int id;
   const unsigned int maxSize;
 
-  std::vector<Client *> players;
+  std::vector<int> members;
 };
 } // namespace bm

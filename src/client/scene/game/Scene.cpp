@@ -5,6 +5,7 @@
 #include "Player.hpp"
 #include "common/Log.hpp"
 #include "common/itf/core.pb.h"
+#include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>
 #include <algorithm>
 #include <thread>
@@ -30,15 +31,14 @@ struct Scene::impl {
 Scene::impl::impl(Scene *base) : base(base) {}
 
 void Scene::impl::onEntry() {
-  msgHandler = std::make_unique<MessageHandler>(
-      GlobalConfig::get().serverIp(), GlobalConfig::get().serverPort());
+  msgHandler = std::make_unique<MessageHandler>(base->shared().connMgr);
 
   if (not msgHandler->isConnected()) {
     LOG_ERR("Couldn't connect to server");
     base->change(SceneId::Lobby);
   }
 
-  player = std::make_unique<Player>(base->getWindow());
+  player = std::make_unique<Player>(base->shared().window);
 }
 
 void Scene::impl::onLeave() {
@@ -47,7 +47,7 @@ void Scene::impl::onLeave() {
 }
 
 void Scene::impl::handleEvents() {
-  auto &window{base->getWindow()};
+  auto &window{base->shared().window};
 
   while (const auto &e = window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
@@ -80,7 +80,7 @@ void Scene::impl::update() {
 }
 
 void Scene::impl::draw() {
-  auto &window{base->getWindow()};
+  auto &window{base->shared().window};
 
   window.clear(sf::Color::Cyan);
   window.draw(*player);

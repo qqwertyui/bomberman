@@ -5,11 +5,11 @@
 #include <span>
 
 namespace bm::scene::game {
-MessageHandler::MessageHandler(const std::string &ip, unsigned int port) {
+MessageHandler::MessageHandler(common::ConnectionManager &connMgr)
+    : connMgr(connMgr) {
   activeBufferIndex = 0;
   passiveBufferIndex = 1;
 
-  connMgr.connect(ip, port);
   if (not isConnected()) {
     return;
   }

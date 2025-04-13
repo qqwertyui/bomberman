@@ -9,7 +9,8 @@
 #include <cassert>
 
 namespace bm {
-Client::Client(const common::ConnectionInfo &info) : connMgr{info} {}
+Client::Client(unsigned int playerId, const common::ConnectionInfo &info)
+    : playerId{playerId}, connMgr{info} {}
 
 void Client::onConnect() {
   auto info{connMgr.getConnectionInfo()};
@@ -59,7 +60,7 @@ void Client::handleQuery(const common::itf::QueryReq &req,
 
       auto *buffer = resp.add_lobbies();
       buffer->set_id(i);
-      buffer->set_connectedplayers(lobby.getMembers().size());
+      buffer->set_connectedplayers(lobby.getMembersIds().size());
       buffer->set_maxplayers(lobby.getMaxSize());
     }
   }
@@ -68,14 +69,71 @@ void Client::handleQuery(const common::itf::QueryReq &req,
 void Client::handleUpdate(const common::itf::UpdateReq &req,
                           common::itf::UpdateResp &resp) {
   if (req.has_lobby()) {
+    handleLobbyUpdate(req.lobby(), *resp.mutable_lobby());
   }
   if (req.has_game()) {
     handleGameUpdate(req.game(), *resp.mutable_game());
   }
 }
 
+void Client::handleLobbyUpdate(const common::itf::UpdateLobbyReq &req,
+                               common::itf::UpdateLobbyResp &resp) {
+  resp.set_status(common::itf::UpdateLobbyResp::OK);
+
+  auto &currentLobbyId{this->lobby};
+  const auto targetLobbyId{req.id()};
+
+  const auto maxNumberOfLobbies{Database::get().getNumberOfLobbies()};
+  if (targetLobbyId >= maxNumberOfLobbies) {
+    LOG_ERR("Player %d sent invalid lobby id: %d (%d available)", playerId,
+            targetLobbyId, maxNumberOfLobbies);
+    resp.set_status(common::itf::UpdateLobbyResp::LOBBY_NONEXISTENT);
+    return;
+  }
+  auto &targetLobby = Database::get().getLobbyById(targetLobbyId);
+
+  if (req.action() == common::itf::UpdateLobbyReq::ENTER) {
+    if (targetLobby.isFull()) {
+      resp.set_status(common::itf::UpdateLobbyResp::LOBBY_FULL);
+      return;
+    }
+    if (currentLobbyId.has_value()) {
+      auto &currentLobby{Database::get().getLobbyById(currentLobbyId.value())};
+      currentLobby.remove(playerId);
+    }
+    targetLobby.add(playerId);
+    currentLobbyId = targetLobbyId;
+
+  } else if (req.action() == common::itf::UpdateLobbyReq::EXIT) {
+    if (not currentLobbyId.has_value()) {
+      LOG_ERR("Player %d tries to leave lobby %d but doesn't belong to one",
+              playerId, targetLobbyId);
+      resp.set_status(common::itf::UpdateLobbyResp::INVALID_REQUEST);
+      return;
+    }
+    if (targetLobbyId != currentLobbyId.value()) {
+      LOG_ERR("Player %d tries to leave lobby %d but belongs to lobby %d",
+              playerId, targetLobbyId, currentLobbyId.value());
+      resp.set_status(common::itf::UpdateLobbyResp::INVALID_REQUEST);
+      return;
+    }
+    auto &currentLobby{Database::get().getLobbyById(currentLobbyId.value())};
+    currentLobby.remove(playerId);
+    currentLobbyId = std::nullopt;
+  } else {
+    LOG_ERR("Player %d sent invalid lobby request (%d)", playerId,
+            static_cast<int>(req.action()));
+    resp.set_status(common::itf::UpdateLobbyResp::INVALID_REQUEST);
+  }
+}
+
 void Client::handleGameUpdate(const common::itf::UpdateGameReq &req,
                               common::itf::UpdateGameResp &resp) {
+  if (not lobby.has_value()) {
+    LOG_ERR("Player %d sent an game update but doesn't belong to any lobby",
+            playerId);
+    return;
+  }
   if (req.has_position()) {
     [[maybe_unused]] const int x{req.position().x()};
     [[maybe_unused]] const int y{req.position().y()};
@@ -86,6 +144,11 @@ void Client::handleGameUpdate(const common::itf::UpdateGameReq &req,
 void Client::onSend(common::itf::S2CMessage &msg) { connMgr.send(msg); }
 
 void Client::onDisconnect() {
+  if (lobby.has_value()) {
+    auto &currentLobby{Database::get().getLobbyById(lobby.value())};
+    currentLobby.remove(playerId);
+  }
+
   auto info{connMgr.getConnectionInfo()};
   assert(info.has_value());
 

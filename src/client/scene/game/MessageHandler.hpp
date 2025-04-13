@@ -9,7 +9,7 @@
 namespace bm::scene::game {
 class MessageHandler {
 public:
-  MessageHandler(const std::string &ip, unsigned int port);
+  MessageHandler(common::ConnectionManager &connMgr);
   ~MessageHandler();
 
   bool isConnected() const;
@@ -40,7 +40,7 @@ private:
   std::array<Buffer, numberOfBuffers> buffers;
   unsigned int activeBufferIndex, passiveBufferIndex;
 
-  common::ConnectionManager connMgr;
+  common::ConnectionManager &connMgr;
   std::thread serverMessageHandler;
 };
 

@@ -1,5 +1,5 @@
 #include "SceneManager.hpp"
-#include "client/GlobalConfig.hpp"
+#include "SharedData.hpp"
 #include "common/Log.hpp"
 #include "game/Scene.hpp"
 #include "lobby/Scene.hpp"
@@ -11,12 +11,14 @@
 
 namespace bm::scene {
 SceneManager::SceneManager(sf::RenderWindow &window)
-    : window(window),
-      fpsText(resource::FontManager::get().at(resource::FontId::MENU)) {
+    : fpsText(resource::FontManager::get().at(resource::FontId::MENU)) {
   fpsText.setCharacterSize(30);
   fpsText.setFillColor(sf::Color::Cyan);
   fpsText.setPosition(sf::Vector2f(30, 30));
   fpsText.setString("FPS: " + std::to_string(0));
+
+  sharedData = new SharedData(window);
+
   add(SceneId::Menu, new menu::Scene(*this));
   add(SceneId::Settings, new settings::Scene(*this));
   add(SceneId::Lobby, new lobby::Scene(*this));
@@ -30,6 +32,9 @@ SceneManager::~SceneManager() {
     if (scene) {
       delete scene;
     }
+  }
+  if (sharedData) {
+    delete sharedData;
   }
 }
 
@@ -76,7 +81,7 @@ void SceneManager::drawFps() {
     fpsClock.restart();
     frameCount = 0;
   }
-  window.draw(fpsText);
+  shared().window.draw(fpsText);
 }
 
 void SceneManager::setFpsVisible(bool value) { showFps = value; }
@@ -90,9 +95,9 @@ void SceneManager::draw() {
   if (showFps) {
     drawFps();
   }
-  window.display();
+  shared().window.display();
 }
 
-sf::RenderWindow &SceneManager::getWindow() { return window; }
+SharedData &SceneManager::shared() { return *sharedData; }
 
 } // namespace bm::scene
