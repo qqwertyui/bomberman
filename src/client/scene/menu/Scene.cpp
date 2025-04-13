@@ -34,7 +34,7 @@ void Scene::handleEvents() {
       handleKeyEvent(keyPressed->scancode);
     } else if (const auto *mouseButton =
                    e->getIf<sf::Event::MouseButtonPressed>()) {
-      handleMouseEvent(mouseButton->button);
+      handleMouseClick(mouseButton->button);
     }
     textBox.handleEvent(*e);
     fpsCheckbox.handleEvent(*e);
@@ -73,7 +73,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   }
 }
 
-void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
+void Scene::handleMouseClick(const sf::Mouse::Button &button) {
   keyboardActive = false;
   auto &window{getWindow()};
   auto localpos = sf::Mouse::getPosition(window);
