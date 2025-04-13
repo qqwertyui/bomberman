@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gui/Button.hpp"
+#include "gui/Checkbox.hpp"
 #include "scene/SceneBase.hpp"
 
 namespace bm::scene::settings {
@@ -10,6 +12,10 @@ public:
   void handleEvents() override;
   void update() override;
   void draw() override;
-};
 
+private:
+  gui::Checkbox fpsCheckbox;
+  gui::Button backButton;
+  void handleMouseClick(const sf::Mouse::Button &button);
+};
 } // namespace bm::scene::settings

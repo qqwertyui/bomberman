@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <functional>
 
 namespace bm::gui {
 
@@ -11,10 +12,12 @@ public:
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
   bool isChecked() const;
+  void setCallback(std::function<void(bool)> callback);
 
 private:
   sf::RectangleShape boxShape;
   sf::RectangleShape checkMark;
   bool checked{false};
+  std::function<void(bool)> callback;
 };
 } // namespace bm::gui

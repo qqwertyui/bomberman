@@ -2,7 +2,6 @@
 
 #include "client/GlobalConfig.hpp"
 #include "gui/Button.hpp"
-#include "gui/Checkbox.hpp"
 #include "gui/TextBox.hpp"
 #include "scene/SceneBase.hpp"
 #include <map>
@@ -20,7 +19,6 @@ private:
   void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
   void handleMouseClick(const sf::Mouse::Button &button);
   gui::TextBox textBox;
-  gui::Checkbox fpsCheckbox;
   enum class ButtonId : unsigned int {
     Start,
     Settings,
