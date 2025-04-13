@@ -27,7 +27,7 @@ Database::Database(unsigned int maxLobbies, unsigned int maxPlayers)
 
   players.reserve(maxPlayers);
   for (unsigned int i = 0; i < maxPlayers; i++) {
-    players.emplace_back(std::make_pair(Client{{}}, false));
+    players.emplace_back(std::make_pair(Client{i, {}}, false));
   }
 }
 
@@ -73,7 +73,7 @@ Database::addPlayer(const common::ConnectionInfo &connection) {
   }
   auto &player = players[*id];
   player.second = true;
-  player.first = {connection};
+  player.first = {*id, connection};
   connectedCounter++;
   return std::make_pair(*id, &player.first);
 }

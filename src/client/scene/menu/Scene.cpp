@@ -1,14 +1,14 @@
 #include "Scene.hpp"
 #include "resource/TextureManager.hpp"
-#include "scene/SceneManager.hpp"
+#include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>
 
 namespace bm::scene::menu {
 Scene::Scene(SceneManager &sceneMgr)
     : SceneBase(sceneMgr),
-      textBox({getWindow().getSize().x / 2.f - 200.f, 100.f}, {400.f, 50.f},
+      textBox({shared().window.getSize().x / 2.f - 200.f, 100.f}, {400.f, 50.f},
               "Enter text ...", 30, 20) {
-  auto &window{getWindow()};
+  auto &window{shared().window};
   float buttonSpacing{60.f};
   float centerX = window.getSize().x / 2.f;
   float centerY = window.getSize().y / 2.f;
@@ -26,7 +26,7 @@ Scene::Scene(SceneManager &sceneMgr)
 }
 
 void Scene::handleEvents() {
-  auto &window{getWindow()};
+  auto &window{shared().window};
   while (const auto &e = window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
       window.close();
@@ -42,7 +42,7 @@ void Scene::handleEvents() {
 
 void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   keyboardActive = true;
-  auto &window{getWindow()};
+  auto &window{shared().window};
   if (scancode == sf::Keyboard::Scancode::Escape) {
     window.close();
   } else if (scancode == sf::Keyboard::Scancode::Up) {
@@ -74,7 +74,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
 
 void Scene::handleMouseClick(const sf::Mouse::Button &button) {
   keyboardActive = false;
-  auto &window{getWindow()};
+  auto &window{shared().window};
   auto localpos = sf::Mouse::getPosition(window);
   sf::Vector2f mousePosf(static_cast<float>(localpos.x),
                          static_cast<float>(localpos.y));
@@ -106,7 +106,7 @@ void Scene::update() {
   if (keyboardActive) {
     return;
   }
-  auto &window{getWindow()};
+  auto &window{shared().window};
   auto localpos = sf::Mouse::getPosition(window);
   sf::Vector2f mousePosf(static_cast<float>(localpos.x),
                          static_cast<float>(localpos.y));
@@ -123,7 +123,7 @@ void Scene::update() {
 }
 
 void Scene::draw() {
-  auto &window{getWindow()};
+  auto &window{shared().window};
   window.clear(sf::Color::Red);
   for (auto &button : buttons) {
     window.draw(button.second);

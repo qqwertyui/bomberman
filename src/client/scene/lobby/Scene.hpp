@@ -1,5 +1,5 @@
 #pragma once
-#include "common/ConnectionManager.hpp"
+
 #include "gui/Button.hpp"
 #include "scene/SceneBase.hpp"
 #include <map>
@@ -17,12 +17,20 @@ public:
   void onLeave() override;
 
 private:
-  void createLobbyButton(const std::vector<std::pair<int, int>> &lobbyData);
+  using LobbyData = std::vector<std::pair<int, int>>;
+  using ButtonMap = std::map<int, gui::Button>;
+
+  void createLobbyButton(const LobbyData &lobbyData);
   void handleMouseClick(const sf::Mouse::Button &button);
   void handleKeyEvent(const sf::Keyboard::Scancode &scancode);
-  common::ConnectionManager connMgr;
-  std::vector<std::pair<int, int>> lobbyData;
-  std::map<int, gui::Button> lobbyButtons;
+  std::optional<unsigned int>
+  getSelectedButtonId(const sf::Vector2f &mousePos) const;
+  bool joinLobby(unsigned int lobbyId);
+  LobbyData fetchLobbyInfo();
+
+  LobbyData lobbyData;
+  ButtonMap lobbyButtons;
+
   bool keyboardActive{true};
   int activeLobbyButton{0};
   const int buttonInColumn{4};

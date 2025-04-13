@@ -2,11 +2,8 @@
 
 #include "SceneId.hpp"
 
-namespace sf {
-class RenderWindow;
-}
-
 namespace bm::scene {
+class SharedData;
 class SceneManager;
 
 class SceneBase {
@@ -21,7 +18,7 @@ public:
   virtual void update() = 0;
   virtual void draw() = 0;
 
-  sf::RenderWindow &getWindow();
+  SharedData &shared();
   void change(const SceneId &sceneId);
 
 private:
