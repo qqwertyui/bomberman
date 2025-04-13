@@ -6,7 +6,8 @@ namespace bm::scene::menu {
 Scene::Scene(SceneManager &sceneMgr)
     : SceneBase(sceneMgr),
       textBox({getWindow().getSize().x / 2.f - 200.f, 100.f}, {400.f, 50.f},
-              "Enter text ...", 30, 20) {
+              "Enter text ...", 30, 20),
+      fpsCheckbox({60.f, 60.f}, {30.f, 30.f}) {
   auto &window{getWindow()};
   float buttonSpacing{60.f};
   float centerX = window.getSize().x / 2.f;
@@ -33,9 +34,10 @@ void Scene::handleEvents() {
       handleKeyEvent(keyPressed->scancode);
     } else if (const auto *mouseButton =
                    e->getIf<sf::Event::MouseButtonPressed>()) {
-      handleMouseEvent(mouseButton->button);
+      handleMouseClick(mouseButton->button);
     }
     textBox.handleEvent(*e);
+    fpsCheckbox.handleEvent(*e);
   }
 }
 
@@ -71,7 +73,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   }
 }
 
-void Scene::handleMouseEvent(const sf::Mouse::Button &button) {
+void Scene::handleMouseClick(const sf::Mouse::Button &button) {
   keyboardActive = false;
   auto &window{getWindow()};
   auto localpos = sf::Mouse::getPosition(window);
@@ -128,6 +130,6 @@ void Scene::draw() {
     window.draw(button.second);
   }
   window.draw(textBox);
-  window.display();
+  window.draw(fpsCheckbox);
 }
 } // namespace bm::scene::menu
