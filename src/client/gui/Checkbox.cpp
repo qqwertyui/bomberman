@@ -18,8 +18,15 @@ void Checkbox::handleEvent(const sf::Event &e) {
     sf::Vector2f mousePos(mousePressed->position);
     if (boxShape.getGlobalBounds().contains(mousePos)) {
       checked = !checked;
+      if (callback) {
+        callback(checked);
+      }
     }
   }
+}
+
+void Checkbox::setCallback(std::function<void(bool)> callback) {
+  this->callback = callback;
 }
 
 bool Checkbox::isChecked() const { return checked; }
