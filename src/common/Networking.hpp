@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/Log.hpp"
+#include "common/logging/Log.hpp"
 
 #ifdef __linux__
 #include <arpa/inet.h>

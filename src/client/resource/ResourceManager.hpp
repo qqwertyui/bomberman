@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/Log.hpp"
+#include "common/logging/Log.hpp"
 #include <map>
 #include <stdexcept>
 

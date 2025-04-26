@@ -3,8 +3,8 @@
 #include "ClientManager.hpp"
 #include "Database.hpp"
 #include "GlobalConfig.hpp"
-#include "common/Log.hpp"
 #include "common/Networking.hpp"
+#include "common/logging/Log.hpp"
 
 #include <google/protobuf/stubs/common.h>
 
@@ -15,8 +15,8 @@ bool Application::initialize(int argc, char **argv) {
   if (not GlobalConfig::load(argc, argv)) {
     return false;
   }
-  common::setLogLevel(
-      static_cast<common::Level>(GlobalConfig::get().logLevel()));
+  common::logging::setLevel(
+      static_cast<common::logging::Level>(GlobalConfig::get().logLevel()));
 
   if (not initNetworking()) {
     LOG_ERR("Networking initialization failed");
