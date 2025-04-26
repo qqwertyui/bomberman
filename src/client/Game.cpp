@@ -16,11 +16,13 @@ bool Game::initialize(int argc, char **argv) {
   if (not GlobalConfig::load(argc, argv)) {
     return false;
   }
+  auto &config{GlobalConfig::get()};
+  common::setLogLevel(static_cast<common::Level>(config.logLevel()));
+
   if (not initNetworking()) {
     LOG_ERR("Networking initialization failed");
     return false;
   }
-  auto &config{GlobalConfig::get()};
   m_window = std::make_unique<sf::RenderWindow>(
       sf::VideoMode(sf::Vector2u(config.windowWidth(), config.windowHeight())),
       "Bomberman");

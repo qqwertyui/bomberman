@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/GlobalConfigBase.hpp"
+#include "common/LogLevel.hpp"
 
 namespace bm {
 struct Params {
@@ -12,6 +13,8 @@ struct Params {
   PARAMETER(int, maxNumberOfPlayers, 100);
   PARAMETER(int, version, 1);
   PARAMETER(int, playerLimitEvaluationTimerMs, 1000);
+  PARAMETER(unsigned int, logLevel,
+            static_cast<unsigned int>(common::Level::INF));
 };
 
 using GlobalConfig = common::GlobalConfigBase<Params>;

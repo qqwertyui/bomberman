@@ -15,6 +15,9 @@ bool Application::initialize(int argc, char **argv) {
   if (not GlobalConfig::load(argc, argv)) {
     return false;
   }
+  common::setLogLevel(
+      static_cast<common::Level>(GlobalConfig::get().logLevel()));
+
   if (not initNetworking()) {
     LOG_ERR("Networking initialization failed");
     return false;

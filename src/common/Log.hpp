@@ -1,24 +1,18 @@
 #pragma once
 
-#include <cstdio>
+#include "LogLevel.hpp"
 
 namespace bm::common {
-void log(FILE *stream, const char *severity, const char *file, int line,
-         const char *format, ...);
-}
+void log(Level level, const char *file, int line, const char *format, ...);
+void setLogLevel(Level level);
+Level getLogLevel();
+} // namespace bm::common
 
 #define LOG_INF(...)                                                           \
-  bm::common::log(stdout, "INF", __FILE__, __LINE__, __VA_ARGS__)
+  bm::common::log(bm::common::Level::INF, __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_WRN(...)                                                           \
-  bm::common::log(stderr, "WRN", __FILE__, __LINE__, __VA_ARGS__)
+  bm::common::log(bm::common::Level::WRN, __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_ERR(...)                                                           \
-  bm::common::log(stderr, "ERR", __FILE__, __LINE__, __VA_ARGS__)
-
-#ifndef NDEBUG
+  bm::common::log(bm::common::Level::ERR, __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_DBG(...)                                                           \
-  bm::common::log(stdout, "DBG", __FILE__, __LINE__, __VA_ARGS__)
-#else
-#define LOG_DBG(...)
-#endif
-
-// namespace bm::common
+  bm::common::log(bm::common::Level::DBG, __FILE__, __LINE__, __VA_ARGS__)
