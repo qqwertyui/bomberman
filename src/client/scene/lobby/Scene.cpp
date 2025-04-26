@@ -5,7 +5,6 @@
 #include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>
 
-
 namespace bm::scene::lobby {
 Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {}
 
@@ -68,9 +67,9 @@ Scene::LobbyData Scene::fetchLobbyInfo() {
 void Scene::handleMouseClick(const sf::Mouse::Button &button) {
   keyboardActive = false;
   auto &window{shared().window};
-  auto localPos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePos(static_cast<float>(localPos.x),
-                        static_cast<float>(localPos.y));
+  auto localPos{sf::Mouse::getPosition(window)};
+  auto mousePos{static_cast<sf::Vector2f>(localPos)};
+
   if (button == sf::Mouse::Button::Left) {
     auto buttonId = getSelectedButtonId(mousePos);
     if (not buttonId) {
@@ -89,7 +88,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
     return;
   }
   keyboardActive = true;
-  int totalLobbiesButtons = static_cast<int>(lobbyButtons.size());
+  auto totalLobbiesButtons = static_cast<int>(lobbyButtons.size());
 
   lobbyButtons.at(activeLobbyButton).setActive(false);
   if (scancode == sf::Keyboard::Scancode::Up) {
@@ -194,8 +193,8 @@ void Scene::update() {
   }
   auto &window = shared().window;
   auto localPos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePos(static_cast<float>(localPos.x),
-                        static_cast<float>(localPos.y));
+  auto mousePos{static_cast<sf::Vector2f>(localPos)};
+
   for (auto &[index, lobbyButton] : lobbyButtons) {
     if (lobbyButton.getButtonBounds().contains(mousePos)) {
       lobbyButton.setActive(true);
