@@ -35,8 +35,8 @@ void Scene::handleEvents() {
 void Scene::handleMouseClick(const sf::Mouse::Button &button) {
   auto &window{shared().window};
   auto localPos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePos(static_cast<float>(localPos.x),
-                        static_cast<float>(localPos.y));
+  auto mousePos{static_cast<sf::Vector2f>(localPos)};
+
   if (button == sf::Mouse::Button::Left) {
     if (backButton.getButtonBounds().contains(mousePos)) {
       backButton.setActive(true);
@@ -48,8 +48,8 @@ void Scene::handleMouseClick(const sf::Mouse::Button &button) {
 void Scene::update() {
   auto &window{shared().window};
   auto localPos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePos(static_cast<float>(localPos.x),
-                        static_cast<float>(localPos.y));
+  auto mousePos{static_cast<sf::Vector2f>(localPos)};
+
   backButton.setActive(false);
   if (backButton.getButtonBounds().contains(mousePos)) {
     backButton.setActive(true);

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "common/GlobalConfigBase.hpp"
+#include "common/ToUnderlying.hpp"
 #include "common/logging/Level.hpp"
+
 
 namespace bm {
 struct Params {
@@ -12,7 +14,7 @@ struct Params {
   PARAMETER(uint16_t, windowWidth, 640);
   PARAMETER(uint16_t, windowHeight, 480);
   PARAMETER(unsigned int, logLevel,
-            static_cast<unsigned int>(common::logging::Level::INF));
+            common::toUnderlying(common::logging::Level::INF));
 };
 
 using GlobalConfig = common::GlobalConfigBase<Params>;

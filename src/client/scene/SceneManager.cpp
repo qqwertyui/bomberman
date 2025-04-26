@@ -1,5 +1,6 @@
 #include "SceneManager.hpp"
 #include "SharedData.hpp"
+#include "common/ToUnderlying.hpp"
 #include "common/logging/Log.hpp"
 #include "game/Scene.hpp"
 #include "lobby/Scene.hpp"
@@ -48,8 +49,7 @@ void SceneManager::remove(const SceneId &sceneId) { scenes.erase(sceneId); }
 void SceneManager::change(const SceneId &sceneId) {
   auto *newScene = getSceneById(sceneId);
   if (newScene == nullptr) {
-    LOG_WRN("Failed to switch to SceneId=%u",
-            static_cast<unsigned int>(sceneId));
+    LOG_WRN("Failed to switch to SceneId=%u", common::toUnderlying(sceneId));
     return;
   }
   if (newScene == active) {

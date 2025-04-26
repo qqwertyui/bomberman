@@ -122,7 +122,7 @@ void Client::handleLobbyUpdate(const common::itf::UpdateLobbyReq &req,
     currentLobbyId = std::nullopt;
   } else {
     LOG_ERR("Player %d sent invalid lobby request (%d)", playerId,
-            static_cast<int>(req.action()));
+            common::toUnderlying(req.action()));
     resp.set_status(common::itf::UpdateLobbyResp::INVALID_REQUEST);
   }
 }

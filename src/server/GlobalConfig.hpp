@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/GlobalConfigBase.hpp"
+#include "common/ToUnderlying.hpp"
 #include "common/logging/Level.hpp"
 
 namespace bm {
@@ -14,7 +15,7 @@ struct Params {
   PARAMETER(int, version, 1);
   PARAMETER(int, playerLimitEvaluationTimerMs, 1000);
   PARAMETER(unsigned int, logLevel,
-            static_cast<unsigned int>(common::logging::Level::INF));
+            common::toUnderlying(common::logging::Level::INF));
 };
 
 using GlobalConfig = common::GlobalConfigBase<Params>;

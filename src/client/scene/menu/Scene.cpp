@@ -1,4 +1,5 @@
 #include "Scene.hpp"
+#include "common/ToUnderlying.hpp"
 #include "resource/TextureManager.hpp"
 #include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>
@@ -49,7 +50,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
     if (m_activeButton > ButtonId::Start) {
       buttons.at(m_activeButton).setActive(false);
       m_activeButton =
-          static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) - 1);
+          static_cast<ButtonId>(common::toUnderlying(m_activeButton) - 1);
       buttons.at(m_activeButton).setActive(true);
       keyboardActive = false;
     }
@@ -57,7 +58,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
     if (m_activeButton < ButtonId::Exit) {
       buttons.at(m_activeButton).setActive(false);
       m_activeButton =
-          static_cast<ButtonId>(static_cast<unsigned int>(m_activeButton) + 1);
+          static_cast<ButtonId>(common::toUnderlying(m_activeButton) + 1);
       buttons.at(m_activeButton).setActive(true);
       keyboardActive = false;
     }
@@ -75,9 +76,9 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
 void Scene::handleMouseClick(const sf::Mouse::Button &button) {
   keyboardActive = false;
   auto &window{shared().window};
-  auto localpos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
-                         static_cast<float>(localpos.y));
+  auto localpos{sf::Mouse::getPosition(window)};
+  auto mousePosf{static_cast<sf::Vector2f>(localpos)};
+
   for (auto &button : buttons) {
     if (button.second.getButtonBounds().contains(mousePosf)) {
       buttons.at(m_activeButton).setActive(false);
@@ -108,8 +109,8 @@ void Scene::update() {
   }
   auto &window{shared().window};
   auto localpos = sf::Mouse::getPosition(window);
-  sf::Vector2f mousePosf(static_cast<float>(localpos.x),
-                         static_cast<float>(localpos.y));
+  auto mousePosf{static_cast<sf::Vector2f>(localpos)};
+
   for (auto &button : buttons) {
     if (button.second.getButtonBounds().contains(mousePosf)) {
       if (m_activeButton != button.first) {

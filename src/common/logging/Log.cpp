@@ -1,4 +1,5 @@
 #include "Log.hpp"
+#include "common/ToUnderlying.hpp"
 #include "common/Utils.hpp"
 #include <array>
 #include <cassert>
@@ -14,17 +15,15 @@ struct Configuration {
 };
 
 static Level currentLevel{Level::INF};
-static std::array<Configuration, static_cast<unsigned int>(Level::SIZE)>
-    profiles = {
-        {{stderr, "ERR"}, {stderr, "WRN"}, {stdout, "INF"}, {stdout, "DBG"}}};
+static std::array<Configuration, toUnderlying(Level::SIZE)> profiles = {
+    {{stderr, "ERR"}, {stderr, "WRN"}, {stdout, "INF"}, {stdout, "DBG"}}};
 
 const Configuration &getConfiguration(Level level) {
-  return profiles[static_cast<unsigned int>(level)];
+  return profiles[toUnderlying(level)];
 }
 
 void setLevel(Level level) {
-  assert(inRange(static_cast<unsigned int>(level), 0u,
-                 static_cast<unsigned int>(Level::SIZE) - 1));
+  assert(inRange(toUnderlying(level), 0u, toUnderlying(Level::SIZE) - 1));
   currentLevel = level;
 }
 
