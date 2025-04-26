@@ -55,7 +55,10 @@ void MessageHandler::handleQuery(
 void MessageHandler::handleUpdate(const common::itf::UpdateResp &msg) {
   const bool ack{msg.has_game() and msg.game().has_ispositionok() and
                  msg.game().ispositionok()};
-  LOG_DBG(ack ? "ack" : "nack");
+  if (not ack) {
+    LOG_WRN("Position validation failed!");
+    return;
+  }
 }
 
 void MessageHandler::handleInd(

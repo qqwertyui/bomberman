@@ -124,7 +124,7 @@ private:
         return;
       }
     }
-    LOG_DBG("Loaded configuration: [%s]", asString().c_str());
+    LOG_INF("Loaded configuration: [%s]", asString().c_str());
     initialized = true;
   }
 
