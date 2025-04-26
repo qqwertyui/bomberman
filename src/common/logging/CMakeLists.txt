@@ -1,0 +1,6 @@
+set(LOGGING_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(LOGGING_SOURCES 
+  "${LOGGING_DIR}/Log.cpp"
+)
+
+target_sources(common PUBLIC ${LOGGING_SOURCES})

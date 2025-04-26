@@ -4,8 +4,8 @@
 #include "GlobalConfig.hpp"
 #include "Lobby.hpp"
 #include "common/ConnectionInfo.hpp"
-#include "common/Log.hpp"
 #include "common/itf/core.pb.h"
+#include "common/logging/Log.hpp"
 #include <cassert>
 
 namespace bm {

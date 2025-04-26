@@ -1,9 +1,10 @@
 #include "Scene.hpp"
 #include "GlobalConfig.hpp"
-#include "common/Log.hpp"
 #include "common/itf/core.pb.h"
+#include "common/logging/Log.hpp"
 #include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>
+
 
 namespace bm::scene::lobby {
 Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {}

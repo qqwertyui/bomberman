@@ -1,6 +1,6 @@
 #include "SceneManager.hpp"
 #include "SharedData.hpp"
-#include "common/Log.hpp"
+#include "common/logging/Log.hpp"
 #include "game/Scene.hpp"
 #include "lobby/Scene.hpp"
 #include "menu/Scene.hpp"

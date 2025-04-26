@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "ArgumentParser.hpp"
-#include "Log.hpp"
+#include "logging/Log.hpp"
 
 namespace bm::common {
 // integral types

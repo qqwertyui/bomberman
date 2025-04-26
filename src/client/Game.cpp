@@ -1,7 +1,7 @@
 #include "Game.hpp"
 #include "GlobalConfig.hpp"
-#include "common/Log.hpp"
 #include "common/Networking.hpp"
+#include "common/logging/Log.hpp"
 #include "resource/FontManager.hpp"
 #include "resource/TextureManager.hpp"
 
@@ -17,7 +17,8 @@ bool Game::initialize(int argc, char **argv) {
     return false;
   }
   auto &config{GlobalConfig::get()};
-  common::setLogLevel(static_cast<common::Level>(config.logLevel()));
+  common::logging::setLevel(
+      static_cast<common::logging::Level>(config.logLevel()));
 
   if (not initNetworking()) {
     LOG_ERR("Networking initialization failed");

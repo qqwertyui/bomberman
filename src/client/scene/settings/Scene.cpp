@@ -1,5 +1,5 @@
 #include "Scene.hpp"
-#include "common/Log.hpp"
+#include "common/logging/Log.hpp"
 #include "scene/SceneManager.hpp"
 #include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>

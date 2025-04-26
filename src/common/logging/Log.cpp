@@ -1,5 +1,5 @@
 #include "Log.hpp"
-#include "Utils.hpp"
+#include "common/Utils.hpp"
 #include <array>
 #include <cassert>
 #include <cstdarg>
@@ -7,28 +7,28 @@
 #include <cstring>
 #include <ctime>
 
-namespace bm::common {
-struct LogConfiguration {
+namespace bm::common::logging {
+struct Configuration {
   FILE *stream;
   const char *severityString;
 };
 
 static Level currentLevel{Level::INF};
-static std::array<LogConfiguration, static_cast<unsigned int>(Level::SIZE)>
+static std::array<Configuration, static_cast<unsigned int>(Level::SIZE)>
     profiles = {
         {{stderr, "ERR"}, {stderr, "WRN"}, {stdout, "INF"}, {stdout, "DBG"}}};
 
-const LogConfiguration &getConfiguration(Level level) {
+const Configuration &getConfiguration(Level level) {
   return profiles[static_cast<unsigned int>(level)];
 }
 
-void setLogLevel(Level level) {
+void setLevel(Level level) {
   assert(inRange(static_cast<unsigned int>(level), 0u,
                  static_cast<unsigned int>(Level::SIZE) - 1));
   currentLevel = level;
 }
 
-Level getLogLevel() { return currentLevel; }
+Level getLevel() { return currentLevel; }
 
 bool checkLevel(Level level) { return (level <= currentLevel); }
 
@@ -44,7 +44,7 @@ std::array<char, 100> getTime() {
   return buffer;
 }
 
-void log(Level level, const char *path, int line, const char *format, ...) {
+void write(Level level, const char *path, int line, const char *format, ...) {
   if (not checkLevel(level)) {
     return;
   }
@@ -61,4 +61,4 @@ void log(Level level, const char *path, int line, const char *format, ...) {
   va_end(args);
 }
 
-} // namespace bm::common
+} // namespace bm::common::logging

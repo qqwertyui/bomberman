@@ -3,9 +3,9 @@
 #include "Client.hpp"
 #include "Database.hpp"
 #include "GlobalConfig.hpp"
-#include "common/Log.hpp"
 #include "common/Networking.hpp"
 #include "common/itf/core.pb.h"
+#include "common/logging/Log.hpp"
 #include <optional>
 #include <thread>
 

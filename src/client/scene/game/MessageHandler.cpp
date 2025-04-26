@@ -1,6 +1,6 @@
 #include "MessageHandler.hpp"
 
-#include "common/Log.hpp"
+#include "common/logging/Log.hpp"
 #include <algorithm>
 #include <span>
 

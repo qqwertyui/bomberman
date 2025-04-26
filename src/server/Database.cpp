@@ -3,8 +3,8 @@
 #include "Client.hpp"
 #include "Lobby.hpp"
 #include "common/ConnectionInfo.hpp"
-#include "common/Log.hpp"
 #include "common/Utils.hpp"
+#include "common/logging/Log.hpp"
 #include <cassert>
 
 namespace bm {

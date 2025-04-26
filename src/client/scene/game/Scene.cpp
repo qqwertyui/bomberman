@@ -3,8 +3,8 @@
 #include "GlobalConfig.hpp"
 #include "MessageHandler.hpp"
 #include "Player.hpp"
-#include "common/Log.hpp"
 #include "common/itf/core.pb.h"
+#include "common/logging/Log.hpp"
 #include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>
 #include <algorithm>

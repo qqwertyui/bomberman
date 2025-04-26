@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ConnectionInfo.hpp"
-#include "Log.hpp"
 #include "Networking.hpp"
+#include "logging/Log.hpp"
 
 #include <cstdint>
 #include <optional>
