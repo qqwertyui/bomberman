@@ -79,7 +79,6 @@ void Scene::handleMouseClick(const sf::Mouse::Button &button) {
     if (not joinLobby(lobbyId)) {
       return;
     }
-    change(SceneId::Game);
   }
 }
 
@@ -109,7 +108,11 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
       activeLobbyButton += buttonInColumn;
     }
   } else if (scancode == sf::Keyboard::Scancode::Enter) {
-    change(SceneId::Game);
+    const auto lobbyId{static_cast<unsigned int>(activeLobbyButton)};
+    auto success = joinLobby(lobbyId);
+    if (not success) {
+      LOG_ERR("Couldn't join the lobby %u", lobbyId);
+    }
   } else if (scancode == sf::Keyboard::Scancode::Escape) {
     change(SceneId::Menu);
   } else {
@@ -156,6 +159,8 @@ bool Scene::joinLobby(unsigned int lobbyId) {
             common::itf::UpdateLobbyResp::Status_Name(status).c_str());
     return false;
   }
+
+  change(SceneId::Game);
   return true;
 }
 
