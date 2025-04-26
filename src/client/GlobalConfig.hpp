@@ -4,7 +4,6 @@
 #include "common/ToUnderlying.hpp"
 #include "common/logging/Level.hpp"
 
-
 namespace bm {
 struct Params {
   PARAMETER(uint16_t, maxFps, 60);
