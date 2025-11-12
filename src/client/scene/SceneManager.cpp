@@ -86,9 +86,28 @@ void SceneManager::drawFps() {
 
 void SceneManager::setFpsVisible(bool value) { showFps = value; }
 
-void SceneManager::handleEvents() { getActive().handleEvents(); }
+void SceneManager::handleEvents() {
+  while (const auto &e = shared().window.pollEvent()) {
+    if (e->is<sf::Event::Closed>()) {
+      shared().window.close();
+    } else if (e->is<sf::Event::FocusGained>()) {
+      LOG_DBG("Window focus gained");
+      hasFocus = true;
+    } else if (e->is<sf::Event::FocusLost>()) {
+      LOG_DBG("Window focus lost");
+      hasFocus = false;
+    } else {
+      getActive().handleEvents(*e);
+    }
+  }
+}
 
-void SceneManager::update() { getActive().update(); }
+void SceneManager::update() {
+  if (not hasFocus) {
+    return;
+  }
+  getActive().update();
+}
 
 void SceneManager::draw() {
   getActive().draw();

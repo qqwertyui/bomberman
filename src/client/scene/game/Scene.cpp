@@ -17,7 +17,7 @@ struct Scene::impl {
   void onEntry();
   void onLeave();
 
-  void handleEvents();
+  void handleEvents(const sf::Event &e);
   void update();
   void draw();
 
@@ -46,15 +46,9 @@ void Scene::impl::onLeave() {
   player.reset();
 }
 
-void Scene::impl::handleEvents() {
-  auto &window{base->shared().window};
-
-  while (const auto &e = window.pollEvent()) {
-    if (e->is<sf::Event::Closed>()) {
-      window.close();
-    } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
-      handleKeyPressed(keyPressed->scancode);
-    }
+void Scene::impl::handleEvents(const sf::Event &e) {
+  if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
+    handleKeyPressed(keyPressed->scancode);
   }
 }
 
@@ -89,7 +83,7 @@ void Scene::impl::draw() {
 Scene::Scene(SceneManager &sceneMgr)
     : SceneBase(sceneMgr), pimpl(new impl{this}) {}
 
-void Scene::handleEvents() { pimpl->handleEvents(); }
+void Scene::handleEvents(const sf::Event &e) { pimpl->handleEvents(e); }
 
 void Scene::update() { pimpl->update(); }
 

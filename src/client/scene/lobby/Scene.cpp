@@ -8,18 +8,12 @@
 namespace bm::scene::lobby {
 Scene::Scene(SceneManager &sceneMgr) : SceneBase(sceneMgr) {}
 
-void Scene::handleEvents() {
-  auto &window{shared().window};
-
-  while (const auto &e = window.pollEvent()) {
-    if (e->is<sf::Event::Closed>()) {
-      window.close();
-    } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
-      handleKeyEvent(keyPressed->scancode);
-    } else if (const auto *mouseButton =
-                   e->getIf<sf::Event::MouseButtonPressed>()) {
-      handleMouseClick(mouseButton->button);
-    }
+void Scene::handleEvents(const sf::Event &e) {
+  if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
+    handleKeyEvent(keyPressed->scancode);
+  } else if (const auto *mouseButton =
+                 e.getIf<sf::Event::MouseButtonPressed>()) {
+    handleMouseClick(mouseButton->button);
   }
 }
 
