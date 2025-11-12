@@ -11,7 +11,7 @@ public:
   void onEntry() override;
   void onLeave() override;
 
-  void handleEvents() override;
+  void handleEvents(const sf::Event &e) override;
   void update() override;
   void draw() override;
 

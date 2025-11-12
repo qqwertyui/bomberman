@@ -16,7 +16,7 @@ void Client::onConnect() {
   auto info{connMgr.getConnectionInfo()};
   assert(info.has_value());
 
-  LOG_DBG("[+] New connection from %s:%u", info->ip.c_str(), info->port);
+  LOG_INF("[+] New connection from %s:%u", info->ip.c_str(), info->port);
 }
 
 std::optional<common::itf::C2SMessage> Client::tryReceive() {
@@ -153,7 +153,7 @@ void Client::onDisconnect() {
   assert(info.has_value());
 
   connMgr.disconnect();
-  LOG_DBG("[-] Disconnected from %s:%u", info->ip.c_str(), info->port);
+  LOG_INF("[-] Disconnected from %s:%u", info->ip.c_str(), info->port);
 }
 
 } // namespace bm

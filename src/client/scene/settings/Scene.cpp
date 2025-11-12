@@ -14,22 +14,16 @@ Scene::Scene(SceneManager &sceneMgr)
       [&sceneMgr](bool isChecked) { sceneMgr.setFpsVisible(isChecked); });
 }
 
-void Scene::handleEvents() {
-  auto &window{shared().window};
-
-  while (const auto &e = window.pollEvent()) {
-    if (e->is<sf::Event::Closed>()) {
-      window.close();
-    } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
-      if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
-        change(SceneId::Menu);
-      }
-    } else if (const auto *mouseButton =
-                   e->getIf<sf::Event::MouseButtonPressed>()) {
-      handleMouseClick(mouseButton->button);
+void Scene::handleEvents(const sf::Event &e) {
+  if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
+    if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
+      change(SceneId::Menu);
     }
-    fpsCheckbox.handleEvent(*e);
+  } else if (const auto *mouseButton =
+                 e.getIf<sf::Event::MouseButtonPressed>()) {
+    handleMouseClick(mouseButton->button);
   }
+  fpsCheckbox.handleEvent(e);
 }
 
 void Scene::handleMouseClick(const sf::Mouse::Button &button) {

@@ -40,6 +40,7 @@ private:
   SharedData *sharedData{nullptr};
   sf::Clock fpsClock;
   bool showFps{false};
+  bool hasFocus{true};
   sf::Text fpsText;
   unsigned int frameCount{0};
 };

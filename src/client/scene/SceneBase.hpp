@@ -2,6 +2,10 @@
 
 #include "SceneId.hpp"
 
+namespace sf {
+struct Event;
+}
+
 namespace bm::scene {
 class SharedData;
 class SceneManager;
@@ -14,7 +18,7 @@ public:
   virtual void onEntry() {};
   virtual void onLeave() {};
 
-  virtual void handleEvents() = 0;
+  virtual void handleEvents(const sf::Event &e) = 0;
   virtual void update() = 0;
   virtual void draw() = 0;
 

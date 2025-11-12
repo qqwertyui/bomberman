@@ -26,19 +26,14 @@ Scene::Scene(SceneManager &sceneMgr)
   buttons.at(ButtonId::Start).setActive(true);
 }
 
-void Scene::handleEvents() {
-  auto &window{shared().window};
-  while (const auto &e = window.pollEvent()) {
-    if (e->is<sf::Event::Closed>()) {
-      window.close();
-    } else if (const auto *keyPressed = e->getIf<sf::Event::KeyPressed>()) {
-      handleKeyEvent(keyPressed->scancode);
-    } else if (const auto *mouseButton =
-                   e->getIf<sf::Event::MouseButtonPressed>()) {
-      handleMouseClick(mouseButton->button);
-    }
-    textBox.handleEvent(*e);
+void Scene::handleEvents(const sf::Event &e) {
+  if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
+    handleKeyEvent(keyPressed->scancode);
+  } else if (const auto *mouseButton =
+                 e.getIf<sf::Event::MouseButtonPressed>()) {
+    handleMouseClick(mouseButton->button);
   }
+  textBox.handleEvent(e);
 }
 
 void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
