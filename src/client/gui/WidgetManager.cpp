@@ -157,6 +157,9 @@ void WidgetManager::update() {
   if (widgets.empty()) {
     return;
   }
+  if (activeWidget) {
+    activeWidget->update();
+  }
   auto mousePosition =
       static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
   const auto mousePositionChanged{mousePosition != lastMousePosition};
