@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Widget.hpp"
 #include <SFML/Graphics.hpp>
 
 namespace bm::gui {
@@ -7,17 +8,22 @@ constexpr int minPrintableAscii{32};
 constexpr int maxPrintableAscii{127};
 constexpr int backspaceAscii{8};
 
-class TextBox : public sf::Drawable, public sf::Transformable {
+class TextBox : public Widget {
 public:
   TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
           const std::string &placeholder = "", unsigned int characterSize = 15,
           std::size_t maxLength = 20);
 
-  void handleEvent(const sf::Event &e);
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
-  void setActive(bool active);
+  bool contains(const sf::Vector2f &coords) const override;
   void updateCursor();
+
+  void onActivate() override;
+  void onDeactivate() override;
+  void onHoverStart() override;
+  void onHoverStop() override;
+  void onEvent(const sf::Event &e);
 
 private:
   bool m_isActive;

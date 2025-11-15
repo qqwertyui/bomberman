@@ -83,7 +83,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   keyboardActive = true;
   auto totalLobbiesButtons = static_cast<int>(lobbyButtons.size());
 
-  lobbyButtons.at(activeLobbyButton).setActive(false);
+  lobbyButtons.at(activeLobbyButton).onHoverStop();
   if (scancode == sf::Keyboard::Scancode::Up) {
     if (activeLobbyButton % buttonInColumn > 0) {
       activeLobbyButton--;
@@ -112,7 +112,7 @@ void Scene::handleKeyEvent(const sf::Keyboard::Scancode &scancode) {
   } else {
     LOG_DBG("Running key pressed!");
   }
-  lobbyButtons.at(activeLobbyButton).setActive(true);
+  lobbyButtons.at(activeLobbyButton).onHoverStart();
 }
 
 std::optional<unsigned int>
@@ -176,11 +176,11 @@ void Scene::createLobbyButton(const Scene::LobbyData &lobbyData) {
     int row = i % buttonInColumn;
     sf::Vector2f buttonPos(startX + column * (buttonSize.x + buttonSpacing),
                            startY + row * (buttonSize.y + buttonSpacing));
-    lobbyButtons.emplace(i, gui::Button(buttonPos, label));
+    lobbyButtons.emplace(i, gui::Button(buttonPos, label, []() {}));
   }
   if (!lobbyButtons.empty()) {
     activeLobbyButton = 0;
-    lobbyButtons.at(activeLobbyButton).setActive(true);
+    lobbyButtons.at(activeLobbyButton).onActivate();
   }
 }
 
@@ -196,9 +196,9 @@ void Scene::update() {
 
   for (auto &[index, lobbyButton] : lobbyButtons) {
     if (lobbyButton.getButtonBounds().contains(mousePos)) {
-      lobbyButton.setActive(true);
+      lobbyButton.onHoverStart();
     } else {
-      lobbyButton.setActive(false);
+      lobbyButton.onHoverStop();
     }
   }
 }

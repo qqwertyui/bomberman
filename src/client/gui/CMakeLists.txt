@@ -4,6 +4,7 @@ set(
   "${GUI_DIR}/Button.cpp"
   "${GUI_DIR}/Checkbox.cpp"
   "${GUI_DIR}/TextBox.cpp"
+  "${GUI_DIR}/WidgetManager.cpp"
 )
 
 target_sources(bomberman-client PUBLIC ${GUI_SOURCES})
