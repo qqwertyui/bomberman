@@ -3,11 +3,12 @@
 #include "resource/TextureManager.hpp"
 
 namespace bm::gui {
-Button::Button(const sf::Vector2f &position, const std::string &label,
-               const std::function<void()> &callback,
+Button::Button(const std::string &id, const sf::Vector2f &position,
+               const std::string &label, const std::function<void()> &callback,
                unsigned int characterSize)
-    : callback{callback}, m_buttonSprite{resource::TextureManager::get().at(
-                              resource::TextureId::BUTTON_INACTIVE)},
+    : Widget(id), callback{callback},
+      m_buttonSprite{resource::TextureManager::get().at(
+          resource::TextureId::BUTTON_INACTIVE)},
       m_buttonLabel{resource::FontManager::get().at(resource::FontId::MENU)} {
   m_buttonSprite.setPosition(position);
   auto buttonSize = m_buttonSprite.getTexture().getSize();
@@ -23,15 +24,15 @@ Button::Button(const sf::Vector2f &position, const std::string &label,
                                          position.y + buttonSize.y / 2.f));
 }
 
-void Button::onActivate() { callback(); }
+void Button::click() { callback(); }
 
-void Button::onHoverStart() {
+void Button::hover() {
   auto &txtManager = resource::TextureManager::get();
   m_buttonSprite.setTexture(txtManager.at(resource::TextureId::BUTTON_ACTIVE),
                             true);
 }
 
-void Button::onHoverStop() {
+void Button::reset() {
   auto &txtManager = resource::TextureManager::get();
   m_buttonSprite.setTexture(txtManager.at(resource::TextureId::BUTTON_INACTIVE),
                             true);

@@ -2,10 +2,10 @@
 #include "resource/FontManager.hpp"
 
 namespace bm::gui {
-TextBox::TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
-                 const std::string &placeholder, unsigned int characterSize,
-                 std::size_t maxLength)
-    : Widget(), m_isActive(false),
+TextBox::TextBox(const std::string &id, const sf::Vector2f &position,
+                 const sf::Vector2f &size, const std::string &placeholder,
+                 unsigned int characterSize, std::size_t maxLength)
+    : Widget(id), m_isActive(false),
       m_text(resource::FontManager::get().at(resource::FontId::MENU)),
       m_maxLength(maxLength),
       m_placeHolder(resource::FontManager::get().at(resource::FontId::MENU)),
@@ -41,21 +41,16 @@ TextBox::TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
   m_cursor.setPosition(m_boxShape.getPosition());
 }
 
-void TextBox::onActivate() {
+void TextBox::click() {
   m_isActive = true;
   m_boxShape.setOutlineColor(sf::Color::Blue);
 }
 
-void TextBox::onDeactivate() {
-  m_isActive = false;
-  m_boxShape.setOutlineColor(sf::Color::Green);
-}
+void TextBox::hover() { m_boxShape.setOutlineColor(sf::Color::Green); }
 
-void TextBox::onHoverStart() { m_boxShape.setOutlineColor(sf::Color::Green); }
+void TextBox::reset() { m_boxShape.setOutlineColor(sf::Color::Black); }
 
-void TextBox::onHoverStop() { m_boxShape.setOutlineColor(sf::Color::Black); }
-
-void TextBox::onEvent(const sf::Event &e) {
+void TextBox::handleEvent(const sf::Event &e) {
   if (not m_isActive) {
     return;
   }
@@ -112,6 +107,8 @@ void TextBox::draw(sf::RenderTarget &target,
 bool TextBox::contains(const sf::Vector2f &coords) const {
   return m_boxShape.getGlobalBounds().contains(coords);
 }
+
+std::string TextBox::value() { return m_inputText; }
 
 void TextBox::updateCursor() {
   if (m_cursorClock.getElapsedTime().asSeconds() <= 0.5f) {

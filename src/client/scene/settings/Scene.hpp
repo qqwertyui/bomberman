@@ -9,8 +9,6 @@ class Scene : public SceneBase {
 public:
   Scene(SceneManager &sceneMgr);
 
-  void onEntry() override;
-
   void handleEvents(const sf::Event &e) override;
   void update() override;
   void draw() override;

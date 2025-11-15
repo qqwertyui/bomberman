@@ -21,7 +21,8 @@ public:
   void add(Widget *widget);
   void remove(Widget *widget);
   void clear();
-  void reset();
+
+  Widget *getById(const std::string &id);
 
   void draw();
   void handleEvents(const sf::Event &e);
