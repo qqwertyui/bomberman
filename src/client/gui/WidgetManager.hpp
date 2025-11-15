@@ -20,6 +20,7 @@ public:
 
   void add(Widget *widget);
   void remove(Widget *widget);
+  void clear();
   void reset();
 
   void draw();

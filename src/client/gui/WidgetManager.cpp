@@ -9,11 +9,7 @@
 namespace bm::gui {
 WidgetManager::WidgetManager(sf::RenderWindow &window) : window(window) {}
 
-WidgetManager::~WidgetManager() {
-  for (const auto *widget : widgets) {
-    delete widget;
-  }
-}
+WidgetManager::~WidgetManager() { clear(); }
 
 void WidgetManager::add(Widget *widget) {
   assert(widget != nullptr);
@@ -24,6 +20,13 @@ void WidgetManager::remove(Widget *widget) {
   assert(widget != nullptr);
   widgets.erase(std::remove(widgets.begin(), widgets.end(), widget),
                 widgets.end());
+}
+
+void WidgetManager::clear() {
+  for (const auto *widget : widgets) {
+    delete widget;
+  }
+  widgets.clear();
 }
 
 void WidgetManager::draw() {

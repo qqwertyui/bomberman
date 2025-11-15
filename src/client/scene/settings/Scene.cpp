@@ -1,5 +1,6 @@
 #include "Scene.hpp"
-#include "common/logging/Log.hpp"
+#include "gui/Button.hpp"
+#include "gui/Checkbox.hpp"
 #include "scene/SceneManager.hpp"
 #include "scene/SharedData.hpp"
 #include <SFML/Graphics.hpp>
@@ -7,58 +8,31 @@
 namespace bm::scene::settings {
 Scene::Scene(SceneManager &sceneMgr)
     : SceneBase(sceneMgr), fpsCheckbox({60.f, 60.f}, {30.f, 30.f}),
-      backButton(
-          {shared().window.getSize().x / 2.f - 100.f,
-           shared().window.getSize().y - 100.f},
-          "Back to Menu", [this]() {}, 25) {
+      widgetManager(shared().window) {
+  widgetManager.add(new gui::Button{{shared().window.getSize().x / 2.f - 100.f,
+                                     shared().window.getSize().y - 100.f},
+                                    "Back to Menu",
+                                    [this]() { change(SceneId::Menu); },
+                                    25});
   fpsCheckbox.setCallback(
       [&sceneMgr](bool isChecked) { sceneMgr.setFpsVisible(isChecked); });
 }
 
+void Scene::onEntry() { widgetManager.reset(); }
+
 void Scene::handleEvents(const sf::Event &e) {
-  if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-    if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
-      change(SceneId::Menu);
-    }
-  } else if (const auto *mouseButton =
-                 e.getIf<sf::Event::MouseButtonPressed>()) {
-    handleMouseClick(mouseButton->button);
-  }
+  widgetManager.handleEvents(e);
   fpsCheckbox.handleEvent(e);
 }
 
-void Scene::handleMouseClick(const sf::Mouse::Button &button) {
-  auto &window{shared().window};
-  auto localPos = sf::Mouse::getPosition(window);
-  auto mousePos{static_cast<sf::Vector2f>(localPos)};
-
-  if (button == sf::Mouse::Button::Left) {
-    if (backButton.getButtonBounds().contains(mousePos)) {
-      backButton.onHoverStart();
-      change(SceneId::Menu);
-    }
-  }
-}
-
-void Scene::update() {
-  auto &window{shared().window};
-  auto localPos = sf::Mouse::getPosition(window);
-  auto mousePos{static_cast<sf::Vector2f>(localPos)};
-
-  backButton.onHoverStop();
-  if (backButton.getButtonBounds().contains(mousePos)) {
-    backButton.onHoverStart();
-  } else {
-    backButton.onHoverStop();
-  }
-}
+void Scene::update() { widgetManager.update(); }
 
 void Scene::draw() {
   auto &window{shared().window};
 
   window.clear(sf::Color::Green);
+  widgetManager.draw();
   window.draw(fpsCheckbox);
-  window.draw(backButton);
 }
 
 } // namespace bm::scene::settings
