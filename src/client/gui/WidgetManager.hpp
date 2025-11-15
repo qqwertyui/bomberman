@@ -39,7 +39,7 @@ private:
   std::vector<Widget *> widgets;
   Widget *activeWidget{nullptr};
   Widget *hoverWidget{nullptr};
-  int previousWidgetIdx{};
+  Widget *lastHoverWidget{nullptr};
   sf::Vector2f lastMousePosition{};
 };
 } // namespace bm::gui

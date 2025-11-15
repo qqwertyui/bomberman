@@ -99,17 +99,21 @@ void WidgetManager::updateHover(const sf::Event &e) {
       scancode != sf::Keyboard::Scancode::Down) {
     return;
   }
-  const auto newWidgetIdx = std::clamp(
-      (previousWidgetIdx + (scancode == sf::Keyboard::Scancode::Up ? -1 : 1)),
-      0, (int)widgets.size() - 1);
-  if (newWidgetIdx != previousWidgetIdx) {
-    widgets[newWidgetIdx]->onHoverStart();
-    widgets[previousWidgetIdx]->onHoverStop();
-  } else if ((newWidgetIdx == previousWidgetIdx) and (not hoverWidget)) {
-    widgets[newWidgetIdx]->onHoverStart();
+  if (not lastHoverWidget) {
+    lastHoverWidget = widgets.front();
   }
-  previousWidgetIdx = newWidgetIdx;
-  hoverWidget = widgets[newWidgetIdx];
+  const auto lastWidgetIdx{*getIndexByWidget(lastHoverWidget)};
+  const auto newWidgetIdx{(unsigned int)std::clamp(
+      ((int)lastWidgetIdx + (scancode == sf::Keyboard::Scancode::Up ? -1 : 1)),
+      0, (int)widgets.size() - 1)};
+
+  if (not hoverWidget) {
+    widgets[newWidgetIdx]->onHoverStart();
+  } else if (newWidgetIdx != lastWidgetIdx) {
+    widgets[newWidgetIdx]->onHoverStart();
+    widgets[lastWidgetIdx]->onHoverStop();
+  }
+  lastHoverWidget = hoverWidget = widgets[newWidgetIdx];
 }
 
 Widget *WidgetManager::getWidgetByCoords(const sf::Vector2f &coords) {
@@ -152,14 +156,14 @@ void WidgetManager::update() {
   if (widget == hoverWidget) {
     return;
   }
-  if (widget) {
-    widget->onHoverStart();
-  }
   if (hoverWidget) {
     hoverWidget->onHoverStop();
   }
+  if (widget) {
+    lastHoverWidget = widget;
+    widget->onHoverStart();
+  }
   hoverWidget = widget;
-  previousWidgetIdx = *getIndexByWidget(widget);
 }
 
 void WidgetManager::reset() { activeWidget = nullptr; }
