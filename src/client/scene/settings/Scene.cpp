@@ -7,9 +7,10 @@
 namespace bm::scene::settings {
 Scene::Scene(SceneManager &sceneMgr)
     : SceneBase(sceneMgr), fpsCheckbox({60.f, 60.f}, {30.f, 30.f}),
-      backButton({shared().window.getSize().x / 2.f - 100.f,
-                  shared().window.getSize().y - 100.f},
-                 "Back to Menu", 25) {
+      backButton(
+          {shared().window.getSize().x / 2.f - 100.f,
+           shared().window.getSize().y - 100.f},
+          "Back to Menu", [this]() {}, 25) {
   fpsCheckbox.setCallback(
       [&sceneMgr](bool isChecked) { sceneMgr.setFpsVisible(isChecked); });
 }
@@ -33,7 +34,7 @@ void Scene::handleMouseClick(const sf::Mouse::Button &button) {
 
   if (button == sf::Mouse::Button::Left) {
     if (backButton.getButtonBounds().contains(mousePos)) {
-      backButton.setActive(true);
+      backButton.onHoverStart();
       change(SceneId::Menu);
     }
   }
@@ -44,11 +45,11 @@ void Scene::update() {
   auto localPos = sf::Mouse::getPosition(window);
   auto mousePos{static_cast<sf::Vector2f>(localPos)};
 
-  backButton.setActive(false);
+  backButton.onHoverStop();
   if (backButton.getButtonBounds().contains(mousePos)) {
-    backButton.setActive(true);
+    backButton.onHoverStart();
   } else {
-    backButton.setActive(false);
+    backButton.onHoverStop();
   }
 }
 

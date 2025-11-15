@@ -5,7 +5,7 @@ namespace bm::gui {
 TextBox::TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
                  const std::string &placeholder, unsigned int characterSize,
                  std::size_t maxLength)
-    : m_isActive(false),
+    : Widget(), m_isActive(false),
       m_text(resource::FontManager::get().at(resource::FontId::MENU)),
       m_maxLength(maxLength),
       m_placeHolder(resource::FontManager::get().at(resource::FontId::MENU)),
@@ -41,43 +41,53 @@ TextBox::TextBox(const sf::Vector2f &position, const sf::Vector2f &size,
   m_cursor.setPosition(m_boxShape.getPosition());
 }
 
-void TextBox::handleEvent(const sf::Event &e) {
-  if (const auto *mousePressed = e.getIf<sf::Event::MouseButtonPressed>()) {
-    sf::Vector2f mousePos(mousePressed->position);
-    setActive(m_boxShape.getGlobalBounds().contains(mousePos));
+void TextBox::onActivate() {
+  m_isActive = true;
+  m_boxShape.setOutlineColor(sf::Color::Blue);
+}
+
+void TextBox::onDeactivate() {
+  m_isActive = false;
+  m_boxShape.setOutlineColor(sf::Color::Green);
+}
+
+void TextBox::onHoverStart() { m_boxShape.setOutlineColor(sf::Color::Green); }
+
+void TextBox::onHoverStop() { m_boxShape.setOutlineColor(sf::Color::Black); }
+
+void TextBox::onEvent(const sf::Event &e) {
+  if (not m_isActive) {
+    return;
   }
-  if (m_isActive) {
-    if (const auto *textEntered = e.getIf<sf::Event::TextEntered>()) {
-      if (textEntered->unicode >= minPrintableAscii &&
-          textEntered->unicode < maxPrintableAscii) {
-        if (m_inputText.size() < m_maxLength) {
-          m_inputText.insert(m_cursorPosition, 1,
-                             static_cast<char>(textEntered->unicode));
-          m_cursorPosition++;
-          m_text.setString(m_inputText);
-        }
-      } else if (textEntered->unicode == backspaceAscii &&
-                 m_cursorPosition > 0) {
-        if (!m_inputText.empty()) {
-          m_inputText.erase(m_cursorPosition - 1, 1);
-          m_cursorPosition--;
-          m_text.setString(m_inputText);
-        }
+  if (const auto *textEntered = e.getIf<sf::Event::TextEntered>()) {
+    if (textEntered->unicode >= minPrintableAscii &&
+        textEntered->unicode < maxPrintableAscii) {
+      if (m_inputText.size() < m_maxLength) {
+        m_inputText.insert(m_cursorPosition, 1,
+                           static_cast<char>(textEntered->unicode));
+        m_cursorPosition++;
+        m_text.setString(m_inputText);
       }
-    } else if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-      if (keyPressed->scancode == sf::Keyboard::Scancode::Left) {
-        if (m_cursorPosition > 0) {
-          m_cursorPosition--;
-        }
-      } else if (keyPressed->scancode == sf::Keyboard::Scancode::Right) {
-        if (m_cursorPosition < m_inputText.size()) {
-          m_cursorPosition++;
-        }
+    } else if (textEntered->unicode == backspaceAscii && m_cursorPosition > 0) {
+      if (!m_inputText.empty()) {
+        m_inputText.erase(m_cursorPosition - 1, 1);
+        m_cursorPosition--;
+        m_text.setString(m_inputText);
       }
     }
-    auto textBounds = m_text.findCharacterPos(m_cursorPosition);
-    m_cursor.setPosition(sf::Vector2f(textBounds.x, m_text.getPosition().y));
+  } else if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
+    if (keyPressed->scancode == sf::Keyboard::Scancode::Left) {
+      if (m_cursorPosition > 0) {
+        m_cursorPosition--;
+      }
+    } else if (keyPressed->scancode == sf::Keyboard::Scancode::Right) {
+      if (m_cursorPosition < m_inputText.size()) {
+        m_cursorPosition++;
+      }
+    }
   }
+  auto textBounds = m_text.findCharacterPos(m_cursorPosition);
+  m_cursor.setPosition(sf::Vector2f(textBounds.x, m_text.getPosition().y));
 }
 
 void TextBox::draw(sf::RenderTarget &target,
@@ -99,9 +109,8 @@ void TextBox::draw(sf::RenderTarget &target,
   }
 }
 
-void TextBox::setActive(bool active) {
-  m_isActive = active;
-  m_boxShape.setOutlineColor(active ? sf::Color::Green : sf::Color::Black);
+bool TextBox::contains(const sf::Vector2f &coords) const {
+  return m_boxShape.getGlobalBounds().contains(coords);
 }
 
 void TextBox::updateCursor() {

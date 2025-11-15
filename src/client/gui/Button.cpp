@@ -4,12 +4,11 @@
 
 namespace bm::gui {
 Button::Button(const sf::Vector2f &position, const std::string &label,
+               const std::function<void()> &callback,
                unsigned int characterSize)
-    : m_buttonSprite{resource::TextureManager::get().at(
-          resource::TextureId::BUTTON_INACTIVE)},
-      m_buttonLabel{resource::FontManager::get().at(resource::FontId::MENU)}
-
-{
+    : callback{callback}, m_buttonSprite{resource::TextureManager::get().at(
+                              resource::TextureId::BUTTON_INACTIVE)},
+      m_buttonLabel{resource::FontManager::get().at(resource::FontId::MENU)} {
   m_buttonSprite.setPosition(position);
   auto buttonSize = m_buttonSprite.getTexture().getSize();
 
@@ -24,16 +23,28 @@ Button::Button(const sf::Vector2f &position, const std::string &label,
                                          position.y + buttonSize.y / 2.f));
 }
 
-void Button::setActive(bool active) {
+void Button::onActivate() { callback(); }
+
+void Button::onHoverStart() {
   auto &txtManager = resource::TextureManager::get();
-  auto &newTexture = active
-                         ? txtManager.at(resource::TextureId::BUTTON_ACTIVE)
-                         : txtManager.at(resource::TextureId::BUTTON_INACTIVE);
-  m_buttonSprite.setTexture(newTexture, true);
+  m_buttonSprite.setTexture(txtManager.at(resource::TextureId::BUTTON_ACTIVE),
+                            true);
 }
+
+void Button::onHoverStop() {
+  auto &txtManager = resource::TextureManager::get();
+  m_buttonSprite.setTexture(txtManager.at(resource::TextureId::BUTTON_INACTIVE),
+                            true);
+}
+
+bool Button::contains(const sf::Vector2f &coords) const {
+  return m_buttonSprite.getGlobalBounds().contains(coords);
+}
+
 sf::FloatRect Button::getButtonBounds() const {
   return m_buttonSprite.getGlobalBounds();
 }
+
 void Button::draw(sf::RenderTarget &target,
                   const sf::RenderStates states) const {
   sf::RenderStates localStates = states;
