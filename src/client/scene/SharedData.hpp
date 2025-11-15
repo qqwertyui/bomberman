@@ -10,6 +10,7 @@ public:
 
   sf::RenderWindow &window;
   common::ConnectionManager connMgr;
+  bool isFpsCounterVisible{};
 };
 
 } // namespace bm::scene

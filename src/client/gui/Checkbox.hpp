@@ -1,23 +1,24 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-#include <functional>
+#include "Widget.hpp"
+#include <string>
 
 namespace bm::gui {
-
-class Checkbox : public sf::Drawable, public sf::Transformable {
+class Checkbox : public Widget {
 public:
-  Checkbox(const sf::Vector2f &position, const sf::Vector2f &size);
-  void handleEvent(const sf::Event &e);
+  Checkbox(const std::string &id, const sf::Vector2f &position,
+           const sf::Vector2f &size);
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
-  bool isChecked() const;
-  void setCallback(std::function<void(bool)> callback);
+
+  void click() override;
+  std::string value() const override;
+
+  bool contains(const sf::Vector2f &coords) const override;
 
 private:
   sf::RectangleShape boxShape;
   sf::RectangleShape checkMark;
   bool checked{false};
-  std::function<void(bool)> callback;
 };
 } // namespace bm::gui
