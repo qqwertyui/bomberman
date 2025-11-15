@@ -48,7 +48,10 @@ void TextBox::click() {
 
 void TextBox::hover() { m_boxShape.setOutlineColor(sf::Color::Green); }
 
-void TextBox::reset() { m_boxShape.setOutlineColor(sf::Color::Black); }
+void TextBox::reset() {
+  m_boxShape.setOutlineColor(sf::Color::Black);
+  m_cursorActive = false;
+}
 
 void TextBox::handleEvent(const sf::Event &e) {
   if (not m_isActive) {
@@ -85,12 +88,18 @@ void TextBox::handleEvent(const sf::Event &e) {
   m_cursor.setPosition(sf::Vector2f(textBounds.x, m_text.getPosition().y));
 }
 
+void TextBox::update() {
+  if (m_cursorClock.getElapsedTime().asSeconds() <= 0.5f) {
+    return;
+  }
+  m_cursorActive = !m_cursorActive;
+  m_cursorClock.restart();
+}
+
 void TextBox::draw(sf::RenderTarget &target,
                    const sf::RenderStates states) const {
   sf::RenderStates localStates = states;
   localStates.transform *= getTransform();
-
-  const_cast<TextBox *>(this)->updateCursor();
 
   target.draw(m_boxShape, localStates);
 
@@ -109,12 +118,4 @@ bool TextBox::contains(const sf::Vector2f &coords) const {
 }
 
 std::string TextBox::value() { return m_inputText; }
-
-void TextBox::updateCursor() {
-  if (m_cursorClock.getElapsedTime().asSeconds() <= 0.5f) {
-    return;
-  }
-  m_cursorActive = !m_cursorActive;
-  m_cursorClock.restart();
-}
 } // namespace bm::gui

@@ -23,6 +23,7 @@ protected:
 
   virtual bool selectable() const { return false; }
   virtual void handleEvent([[maybe_unused]] const sf::Event &e) {}
+  virtual void update() {}
 
   virtual bool contains(const sf::Vector2f &coords) const = 0;
   friend class WidgetManager;

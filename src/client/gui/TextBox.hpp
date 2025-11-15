@@ -17,14 +17,15 @@ public:
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
   bool contains(const sf::Vector2f &coords) const override;
-  void updateCursor();
   std::string value() override;
 
-  void handleEvent(const sf::Event &e) override;
   void click() override;
   void hover() override;
   void reset() override;
+
   bool selectable() const override { return true; }
+  void handleEvent(const sf::Event &e) override;
+  void update() override;
 
 private:
   bool m_isActive;
