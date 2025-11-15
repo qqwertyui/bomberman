@@ -14,7 +14,6 @@ public:
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
   bool contains(const sf::Vector2f &coords) const override;
-  sf::FloatRect getButtonBounds() const;
 
   void click() override;
   void hover() override;

@@ -2,10 +2,17 @@
 #include "resource/FontManager.hpp"
 
 namespace bm::gui {
+
+namespace {
+constexpr int minPrintableAscii{32};
+constexpr int maxPrintableAscii{127};
+constexpr int backspaceAscii{8};
+} // namespace
+
 TextBox::TextBox(const std::string &id, const sf::Vector2f &position,
                  const sf::Vector2f &size, const std::string &placeholder,
                  unsigned int characterSize, std::size_t maxLength)
-    : Widget(id), m_isActive(false),
+    : Widget(id),
       m_text(resource::FontManager::get().at(resource::FontId::MENU)),
       m_maxLength(maxLength),
       m_placeHolder(resource::FontManager::get().at(resource::FontId::MENU)),
@@ -41,10 +48,7 @@ TextBox::TextBox(const std::string &id, const sf::Vector2f &position,
   m_cursor.setPosition(m_boxShape.getPosition());
 }
 
-void TextBox::click() {
-  m_isActive = true;
-  m_boxShape.setOutlineColor(sf::Color::Blue);
-}
+void TextBox::click() { m_boxShape.setOutlineColor(sf::Color::Blue); }
 
 void TextBox::hover() { m_boxShape.setOutlineColor(sf::Color::Green); }
 
@@ -54,11 +58,8 @@ void TextBox::reset() {
 }
 
 void TextBox::handleEvent(const sf::Event &e) {
-  if (not m_isActive) {
-    return;
-  }
   if (const auto *textEntered = e.getIf<sf::Event::TextEntered>()) {
-    if (textEntered->unicode >= minPrintableAscii &&
+    if (textEntered->unicode >= minPrintableAscii and
         textEntered->unicode < maxPrintableAscii) {
       if (m_inputText.size() < m_maxLength) {
         m_inputText.insert(m_cursorPosition, 1,
@@ -66,8 +67,9 @@ void TextBox::handleEvent(const sf::Event &e) {
         m_cursorPosition++;
         m_text.setString(m_inputText);
       }
-    } else if (textEntered->unicode == backspaceAscii && m_cursorPosition > 0) {
-      if (!m_inputText.empty()) {
+    } else if (textEntered->unicode == backspaceAscii and
+               m_cursorPosition > 0) {
+      if (not m_inputText.empty()) {
         m_inputText.erase(m_cursorPosition - 1, 1);
         m_cursorPosition--;
         m_text.setString(m_inputText);
@@ -92,7 +94,7 @@ void TextBox::update() {
   if (m_cursorClock.getElapsedTime().asSeconds() <= 0.5f) {
     return;
   }
-  m_cursorActive = !m_cursorActive;
+  m_cursorActive = not m_cursorActive;
   m_cursorClock.restart();
 }
 
@@ -103,12 +105,12 @@ void TextBox::draw(sf::RenderTarget &target,
 
   target.draw(m_boxShape, localStates);
 
-  if (m_inputText.empty() && !m_isActive) {
+  if (m_inputText.empty()) {
     target.draw(m_placeHolder, localStates);
-  } else {
-    target.draw(m_text, localStates);
+    return;
   }
-  if (m_isActive && m_cursorActive) {
+  target.draw(m_text, localStates);
+  if (m_cursorActive) {
     target.draw(m_cursor, localStates);
   }
 }
@@ -117,5 +119,5 @@ bool TextBox::contains(const sf::Vector2f &coords) const {
   return m_boxShape.getGlobalBounds().contains(coords);
 }
 
-std::string TextBox::value() { return m_inputText; }
+std::string TextBox::value() const { return m_inputText; }
 } // namespace bm::gui

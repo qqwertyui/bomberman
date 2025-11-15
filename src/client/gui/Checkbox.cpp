@@ -1,8 +1,9 @@
 #include "Checkbox.hpp"
 
 namespace bm::gui {
-Checkbox::Checkbox(const sf::Vector2f &position, const sf::Vector2f &size)
-    : checked(false) {
+Checkbox::Checkbox(const std::string &id, const sf::Vector2f &position,
+                   const sf::Vector2f &size)
+    : Widget(id) {
   boxShape.setPosition(position);
   boxShape.setSize(size);
   boxShape.setFillColor(sf::Color::White);
@@ -13,23 +14,14 @@ Checkbox::Checkbox(const sf::Vector2f &position, const sf::Vector2f &size)
   checkMark.setFillColor(sf::Color::Green);
   checkMark.setPosition(sf::Vector2f{position.x + 3.f, position.y + 3.f});
 }
-void Checkbox::handleEvent(const sf::Event &e) {
-  if (const auto *mousePressed = e.getIf<sf::Event::MouseButtonPressed>()) {
-    sf::Vector2f mousePos(mousePressed->position);
-    if (boxShape.getGlobalBounds().contains(mousePos)) {
-      checked = !checked;
-      if (callback) {
-        callback(checked);
-      }
-    }
-  }
+
+bool Checkbox::contains(const sf::Vector2f &coords) const {
+  return boxShape.getGlobalBounds().contains(coords);
 }
 
-void Checkbox::setCallback(std::function<void(bool)> callback) {
-  this->callback = callback;
-}
+std::string Checkbox::value() const { return (checked) ? "set" : ""; }
 
-bool Checkbox::isChecked() const { return checked; }
+void Checkbox::click() { checked = (not checked); }
 
 void Checkbox::draw(sf::RenderTarget &target,
                     const sf::RenderStates states) const {

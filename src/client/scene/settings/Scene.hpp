@@ -14,7 +14,6 @@ public:
   void draw() override;
 
 private:
-  gui::Checkbox fpsCheckbox;
   gui::WidgetManager widgetManager;
 };
 } // namespace bm::scene::settings

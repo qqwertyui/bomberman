@@ -84,8 +84,6 @@ void SceneManager::drawFps() {
   shared().window.draw(fpsText);
 }
 
-void SceneManager::setFpsVisible(bool value) { showFps = value; }
-
 void SceneManager::handleEvents() {
   while (const auto &e = shared().window.pollEvent()) {
     if (e->is<sf::Event::Closed>()) {
@@ -111,7 +109,7 @@ void SceneManager::update() {
 
 void SceneManager::draw() {
   getActive().draw();
-  if (showFps) {
+  if (shared().isFpsCounterVisible) {
     drawFps();
   }
   shared().window.display();

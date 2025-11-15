@@ -4,10 +4,6 @@
 #include <SFML/Graphics.hpp>
 
 namespace bm::gui {
-constexpr int minPrintableAscii{32};
-constexpr int maxPrintableAscii{127};
-constexpr int backspaceAscii{8};
-
 class TextBox : public Widget {
 public:
   TextBox(const std::string &id, const sf::Vector2f &position,
@@ -17,7 +13,7 @@ public:
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
   bool contains(const sf::Vector2f &coords) const override;
-  std::string value() override;
+  std::string value() const override;
 
   void click() override;
   void hover() override;
