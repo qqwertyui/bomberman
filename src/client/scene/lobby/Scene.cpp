@@ -18,8 +18,6 @@ void Scene::handleEvents(const sf::Event &e) {
 }
 
 void Scene::onEntry() {
-  widgetManager.reset();
-
   auto &connMgr{shared().connMgr};
   connMgr.connect(GlobalConfig::get().serverIp(),
                   GlobalConfig::get().serverPort());
@@ -117,12 +115,13 @@ void Scene::createLobbyButton(const Scene::LobbyData &lobbyData) {
     sf::Vector2f buttonPos(startX + column * (buttonSize.x + buttonSpacing),
                            startY + row * (buttonSize.y + buttonSpacing));
 
-    widgetManager.add(new gui::Button(buttonPos, label, [this, i]() {
-      auto success = joinLobby(i);
-      if (not success) {
-        LOG_ERR("Couldn't join the lobby %u", i);
-      }
-    }));
+    widgetManager.add(new gui::Button(
+        std::format("lobby_{}", i), buttonPos, label, [this, i]() {
+          auto success = joinLobby(i);
+          if (not success) {
+            LOG_ERR("Couldn't join the lobby %u", i);
+          }
+        }));
   }
 }
 

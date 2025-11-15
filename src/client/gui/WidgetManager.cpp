@@ -13,6 +13,10 @@ WidgetManager::~WidgetManager() { clear(); }
 
 void WidgetManager::add(Widget *widget) {
   assert(widget != nullptr);
+  auto result =
+      std::find_if(widgets.begin(), widgets.end(),
+                   [&widget](Widget *w) { return (w->id() == widget->id()); });
+  assert(result == widgets.end());
   widgets.push_back(widget);
 }
 
@@ -29,6 +33,12 @@ void WidgetManager::clear() {
   widgets.clear();
 }
 
+Widget *WidgetManager::getById(const std::string &id) {
+  auto result = std::find_if(widgets.begin(), widgets.end(),
+                             [&id](Widget *w) { return (w->id() == id); });
+  return (result != widgets.end()) ? *result : nullptr;
+}
+
 void WidgetManager::draw() {
   for (const auto *widget : widgets) {
     window.draw(*widget);
@@ -40,20 +50,22 @@ void WidgetManager::handleEvents(const sf::Event &e) {
     return;
   }
   if (shouldDeactivateWidget(e)) {
-    activeWidget->onDeactivate();
+    activeWidget->reset();
     activeWidget = nullptr;
     return;
   }
   if (shouldActivateWidget(e)) {
-    activeWidget = hoverWidget;
-    activeWidget->onActivate();
+    if (hoverWidget->selectable()) {
+      activeWidget = hoverWidget;
+    }
+    hoverWidget->click();
     return;
   }
   if (not activeWidget) {
     updateHover(e);
     return;
   }
-  activeWidget->onEvent(e);
+  activeWidget->handleEvent(e);
 }
 
 bool WidgetManager::shouldDeactivateWidget(const sf::Event &e) {
@@ -108,10 +120,10 @@ void WidgetManager::updateHover(const sf::Event &e) {
       0, (int)widgets.size() - 1)};
 
   if (not hoverWidget) {
-    widgets[newWidgetIdx]->onHoverStart();
+    widgets[newWidgetIdx]->hover();
   } else if (newWidgetIdx != lastWidgetIdx) {
-    widgets[newWidgetIdx]->onHoverStart();
-    widgets[lastWidgetIdx]->onHoverStop();
+    widgets[newWidgetIdx]->hover();
+    widgets[lastWidgetIdx]->reset();
   }
   lastHoverWidget = hoverWidget = widgets[newWidgetIdx];
 }
@@ -157,14 +169,12 @@ void WidgetManager::update() {
     return;
   }
   if (hoverWidget) {
-    hoverWidget->onHoverStop();
+    hoverWidget->reset();
   }
   if (widget) {
     lastHoverWidget = widget;
-    widget->onHoverStart();
+    widget->hover();
   }
   hoverWidget = widget;
 }
-
-void WidgetManager::reset() { activeWidget = nullptr; }
 } // namespace bm::gui

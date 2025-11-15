@@ -8,17 +8,17 @@
 namespace bm::gui {
 class Button : public Widget {
 public:
-  Button(const sf::Vector2f &position, const std::string &label,
-         const std::function<void()> &callback,
+  Button(const std::string &id, const sf::Vector2f &position,
+         const std::string &label, const std::function<void()> &callback,
          unsigned int characterSize = 25);
   void draw(sf::RenderTarget &target,
             const sf::RenderStates states) const override;
   bool contains(const sf::Vector2f &coords) const override;
   sf::FloatRect getButtonBounds() const;
 
-  void onActivate() override;
-  void onHoverStart() override;
-  void onHoverStop() override;
+  void click() override;
+  void hover() override;
+  void reset() override;
 
 private:
   std::function<void()> callback{};

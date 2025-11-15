@@ -19,22 +19,23 @@ Scene::Scene(SceneManager &sceneMgr)
   sf::Vector2f exitButton(centerX - ButtonSize.x / 2.f,
                           centerY - ButtonSize.y / 2.f + buttonSpacing);
 
-  widgetManager.add(
-      new gui::TextBox({shared().window.getSize().x / 2.f - 200.f, 100.f},
-                       {400.f, 50.f}, "Enter text ...", 30, 20));
-  widgetManager.add(new gui::Button(startButton, "Start",
+  widgetManager.add(new gui::TextBox(
+      "server_ip", {shared().window.getSize().x / 2.f - 200.f, 100.f},
+      {400.f, 50.f}, "Enter text ...", 30, 20));
+  widgetManager.add(new gui::Button("start", startButton, "Start",
                                     [this]() { change(SceneId::Lobby); }));
-  widgetManager.add(new gui::Button(settingsButton, "Settings",
+  widgetManager.add(new gui::Button("settings", settingsButton, "Settings",
                                     [this]() { change(SceneId::Settings); }));
-  widgetManager.add(new gui::Button(exitButton, "Exit",
+  widgetManager.add(new gui::Button("exit", exitButton, "Exit",
                                     [this]() { shared().window.close(); }));
 }
 
-void Scene::onEntry() { widgetManager.reset(); }
-
 void Scene::handleEvents(const sf::Event &e) { widgetManager.handleEvents(e); }
 
-void Scene::update() { widgetManager.update(); }
+void Scene::update() {
+  widgetManager.update();
+  // LOG_INF("%s", widgetManager.getById("server_ip")->value().c_str());
+}
 
 void Scene::draw() {
   auto &window{shared().window};
