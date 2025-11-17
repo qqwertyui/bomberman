@@ -1,0 +1,7 @@
+syntax = "proto2";
+package bm.common.itf;
+
+message Position {
+  required float x = 1;
+  required float y = 2;
+}

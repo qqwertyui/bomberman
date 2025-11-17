@@ -90,22 +90,17 @@ void SceneManager::handleEvents() {
       shared().window.close();
     } else if (e->is<sf::Event::FocusGained>()) {
       LOG_DBG("Window focus gained");
-      hasFocus = true;
+      shared().isWindowFocused = true;
     } else if (e->is<sf::Event::FocusLost>()) {
       LOG_DBG("Window focus lost");
-      hasFocus = false;
+      shared().isWindowFocused = false;
     } else {
       getActive().handleEvents(*e);
     }
   }
 }
 
-void SceneManager::update() {
-  if (not hasFocus) {
-    return;
-  }
-  getActive().update();
-}
+void SceneManager::update() { getActive().update(); }
 
 void SceneManager::draw() {
   getActive().draw();

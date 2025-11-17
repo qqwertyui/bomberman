@@ -3,6 +3,7 @@
 #include "GlobalConfig.hpp"
 #include "MessageHandler.hpp"
 #include "Player.hpp"
+#include "PlayerModel.hpp"
 #include "common/itf/core.pb.h"
 #include "common/logging/Log.hpp"
 #include "scene/SharedData.hpp"
@@ -31,45 +32,37 @@ struct Scene::impl {
 Scene::impl::impl(Scene *base) : base(base) {}
 
 void Scene::impl::onEntry() {
-  msgHandler = std::make_unique<MessageHandler>(base->shared().connMgr);
-
-  if (not msgHandler->isConnected()) {
-    LOG_ERR("Couldn't connect to server");
-    base->change(SceneId::Lobby);
-  }
-
-  player = std::make_unique<Player>(base->shared().window);
+  msgHandler = std::make_unique<MessageHandler>(base->shared());
+  player = std::make_unique<Player>(base->shared().window, base->shared());
 }
 
 void Scene::impl::onLeave() {
   msgHandler.reset();
   player.reset();
+  for (auto &[id, enemy] : base->shared().gameContext.enemies) {
+    delete enemy;
+  }
+  base->shared().gameContext.enemies.clear();
 }
 
 void Scene::impl::handleEvents(const sf::Event &e) {
-  if (const auto *keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-    handleKeyPressed(keyPressed->scancode);
-  }
-}
-
-void Scene::impl::handleKeyPressed(const sf::Keyboard::Scancode &scancode) {
-  if (scancode == sf::Keyboard::Scancode::Escape) {
+  const auto *keyPressed = e.getIf<sf::Event::KeyPressed>();
+  if (keyPressed and (keyPressed->scancode == sf::Keyboard::Scancode::Escape)) {
     base->change(SceneId::Lobby);
-    return;
   }
 }
 
 void Scene::impl::update() {
-  common::itf::C2SMessage req;
-  player->update(req);
   msgHandler->handle();
 
-  if (req.has_update()) {
-    auto success = msgHandler->send(req);
-    if (not success) {
-      LOG_ERR("Couldn't send an update to the server, leaving...");
-      base->change(SceneId::Menu);
-    }
+  if (not base->shared().isWindowFocused) {
+    return;
+  }
+  common::itf::C2SMessage req;
+  player->update(req);
+  if (req.has_update() and (not msgHandler->send(req))) {
+    LOG_ERR("Lost connection with the server");
+    base->change(SceneId::Menu);
   }
 }
 
@@ -78,6 +71,9 @@ void Scene::impl::draw() {
 
   window.clear(sf::Color::Cyan);
   window.draw(*player);
+  for (auto &[id, enemy] : base->shared().gameContext.enemies) {
+    window.draw(*enemy);
+  }
 }
 
 Scene::Scene(SceneManager &sceneMgr)

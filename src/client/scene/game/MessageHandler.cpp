@@ -1,12 +1,13 @@
 #include "MessageHandler.hpp"
 
+#include "PlayerModel.hpp"
 #include "common/logging/Log.hpp"
 #include <algorithm>
 #include <span>
 
 namespace bm::scene::game {
-MessageHandler::MessageHandler(common::ConnectionManager &connMgr)
-    : connMgr(connMgr) {
+MessageHandler::MessageHandler(SharedData &shared)
+    : connMgr(shared.connMgr), gameContext(shared.gameContext) {
   activeBufferIndex = 0;
   passiveBufferIndex = 1;
 
@@ -61,9 +62,23 @@ void MessageHandler::handleUpdate(const common::itf::UpdateResp &msg) {
   }
 }
 
-void MessageHandler::handleInd(
-    [[maybe_unused]] const common::itf::UpdateInd &msg) {
-  //
+void MessageHandler::handleInd(const common::itf::UpdateInd &msg) {
+  if (msg.has_playerinfo()) {
+    auto &info = msg.playerinfo();
+
+    if (info.has_action() and
+        info.action() == common::itf::LobbyAction::ENTER) {
+      gameContext.enemies[info.id()] = new PlayerModel();
+    }
+    if (info.has_action() and info.action() == common::itf::LobbyAction::EXIT) {
+      delete gameContext.enemies[info.id()];
+      gameContext.enemies.erase(info.id());
+    }
+    if (info.has_position()) {
+      auto &position = info.position();
+      gameContext.enemies[info.id()]->setPosition({position.x(), position.y()});
+    }
+  }
 }
 
 void MessageHandler::handleMessage(const common::itf::S2CMessage &msg) {
@@ -86,7 +101,6 @@ void MessageHandler::handle() {
   for (const auto &msg : messages) {
     handleMessage(msg);
   }
-
   buffer.size = 0;
 }
 

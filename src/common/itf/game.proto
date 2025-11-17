@@ -1,11 +1,7 @@
 syntax = "proto2";
 package bm.common.itf;
 
-
-message Position {
-  required int32 x = 1;
-  required int32 y = 2;
-}
+import "types.proto";
 
 message UpdateGameReq {
   optional bool bombPlanted = 1;

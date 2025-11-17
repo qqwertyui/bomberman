@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameContext.hpp"
 #include "common/ConnectionManager.hpp"
 #include <SFML/Graphics.hpp>
 
@@ -10,7 +11,9 @@ public:
 
   sf::RenderWindow &window;
   common::ConnectionManager connMgr;
+  GameContext gameContext;
   bool isFpsCounterVisible{};
+  bool isWindowFocused{};
 };
 
 } // namespace bm::scene

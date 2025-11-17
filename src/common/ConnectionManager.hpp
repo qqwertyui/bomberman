@@ -18,11 +18,11 @@ public:
 
   std::optional<ConnectionInfo> getConnectionInfo() { return info; }
 
-  void connect(const std::string &ip, const uint16_t port) {
+  bool connect(const std::string &ip, const uint16_t port) {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd == -1) {
       LOG_ERR("Socket creation failed: %s", strerror(errno));
-      return;
+      return false;
     }
     struct sockaddr_in server;
     server.sin_addr.s_addr = inet_addr(ip.c_str());
@@ -31,12 +31,15 @@ public:
 
     if (::connect(fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
       LOG_ERR("Couldn't connect to %s:%u", ip.c_str(), port);
-      return;
+      return false;
     }
 
+    txSn = 0;
+    rxSn = -1;
     info =
         ConnectionInfo{fd, inet_ntoa(server.sin_addr), htons(server.sin_port)};
     LOG_DBG("Connected to %s:%u", info->ip.c_str(), info->port);
+    return true;
   }
 
   void disconnect() {
@@ -47,11 +50,13 @@ public:
     info.reset();
   }
 
-  template <typename Message> bool send(const Message &msg) {
+  template <typename Message> bool send(Message &msg) {
     if (not isConnected()) {
       LOG_ERR("Not connected");
       return false;
     }
+    msg.set_sn(txSn++);
+
     std::string serializedMsg;
     msg.SerializeToString(&serializedMsg);
     unsigned int byteSizeLong = msg.ByteSizeLong();
@@ -72,7 +77,6 @@ public:
 
   template <typename Message> std::optional<Message> receive() {
     if (not isConnected()) {
-      LOG_ERR("Not connected");
       return std::nullopt;
     }
     unsigned int byteSizeLong;
@@ -87,6 +91,11 @@ public:
     serializedMsg.resize(byteSizeLong);
     recv(info->fd, (char *)serializedMsg.c_str(), byteSizeLong, MSG_WAITALL);
     msg.ParseFromString(serializedMsg);
+    if ((rxSn + 1) != msg.sn()) {
+      LOG_WRN("Missed SNs from %d to %d", rxSn, msg.sn());
+    }
+    rxSn = msg.sn();
+
     LOG_DBG("[recv] msg:%s, size:%u, body:%s", msg.GetTypeName().c_str(),
             byteSizeLong, msg.DebugString().c_str());
     return msg;
@@ -102,6 +111,8 @@ public:
   }
 
 private:
+  int txSn{0};
+  int rxSn{-1};
   std::optional<ConnectionInfo> info;
 };
 } // namespace bm::common
