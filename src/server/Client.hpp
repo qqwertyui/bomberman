@@ -2,6 +2,7 @@
 
 #include "common/ConnectionManager.hpp"
 #include "common/itf/core.pb.h"
+#include <SFML/System/Vector2.hpp>
 #include <optional>
 #include <string>
 
@@ -21,6 +22,9 @@ public:
   void onSend(common::itf::S2CMessage &msg);
   void onDisconnect();
 
+  int id() const;
+  sf::Vector2f getPosition() const;
+
 private:
   bool handleMessage(const common::itf::C2SMessage &req,
                      common::itf::S2CMessage &resp);
@@ -37,6 +41,13 @@ private:
   common::ConnectionManager connMgr;
   bool shouldExit{false};
   std::optional<unsigned int> lobby;
+
+  sf::Vector2f position;
+
+  int txSn{0};
+  int rxSn{-1};
+
+  friend class ClientManager;
 };
 
 } // namespace bm

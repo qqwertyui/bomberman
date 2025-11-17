@@ -1,15 +1,21 @@
 syntax = "proto2";
 package bm.common.itf;
 
+import "types.proto";
 
-message UpdateLobbyReq {
-  enum Action {
-    ENTER = 0;
-    EXIT = 1;
-  }
-  
+enum LobbyAction {
+  ENTER = 0;
+  EXIT = 1;
+}
+
+message LobbyPlayerInfo {
+  required int32 id = 1;
+  optional Position position = 2;
+}
+
+message UpdateLobbyReq {  
   required uint32 id = 1;
-  required Action action = 2;
+  required LobbyAction action = 2;
 }
 
 message UpdateLobbyResp {
@@ -21,4 +27,6 @@ message UpdateLobbyResp {
   }
 
   required Status status = 1;
+  optional LobbyPlayerInfo player = 2;
+  repeated LobbyPlayerInfo enemies = 3;
 }

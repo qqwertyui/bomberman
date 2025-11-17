@@ -4,6 +4,7 @@
 #include "common/logging/Log.hpp"
 #include "gui/Button.hpp"
 #include "scene/SharedData.hpp"
+#include "scene/game/PlayerModel.hpp"
 #include <SFML/Graphics.hpp>
 
 namespace bm::scene::lobby {
@@ -19,14 +20,17 @@ void Scene::handleEvents(const sf::Event &e) {
 
 void Scene::onEntry() {
   auto &connMgr{shared().connMgr};
-  connMgr.connect(GlobalConfig::get().serverIp(),
-                  GlobalConfig::get().serverPort());
-  if (not connMgr.isConnected()) {
+  shared().gameContext.reset();
+
+  if ((not connMgr.isConnected()) and
+      (not connMgr.connect(GlobalConfig::get().serverIp(),
+                           GlobalConfig::get().serverPort()))) {
     LOG_ERR("Couldn't connect to server");
     return;
   }
   auto info = fetchLobbyInfo();
   if (info.empty()) {
+    LOG_INF("No lobbies are available");
     return;
   }
   createLobbyButton(info);
@@ -69,7 +73,7 @@ bool Scene::joinLobby(unsigned int lobbyId) {
   common::itf::C2SMessage req;
   auto *targetLobby = req.mutable_update()->mutable_lobby();
   targetLobby->set_id(lobbyId);
-  targetLobby->set_action(common::itf::UpdateLobbyReq::ENTER);
+  targetLobby->set_action(common::itf::LobbyAction::ENTER);
 
   if (not connMgr.send(req)) {
     return false;
@@ -89,6 +93,25 @@ bool Scene::joinLobby(unsigned int lobbyId) {
             common::itf::UpdateLobbyResp::Status_Name(status).c_str());
     return false;
   }
+  auto &lobby = resp->update().lobby();
+  if (not lobby.has_player()) {
+    LOG_ERR("No player information provided");
+    return false;
+  }
+  auto &mainPlayer{lobby.player()};
+  shared().gameContext.player = {(unsigned int)mainPlayer.id()};
+  shared().gameContext.player->model = new game::PlayerModel();
+  shared().gameContext.player->model->setPosition(sf::Vector2f{
+      (float)mainPlayer.position().x(), (float)mainPlayer.position().y()});
+
+  for (auto &player : lobby.enemies()) {
+    auto &model = shared().gameContext.enemies[player.id()];
+    model = new game::PlayerModel();
+    model->setPosition(sf::Vector2f{(float)player.position().x(),
+                                    (float)player.position().y()});
+  }
+
+  shared().gameContext.lobby = {lobbyId, 2};
   change(SceneId::Game);
   return true;
 }

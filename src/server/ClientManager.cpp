@@ -3,6 +3,7 @@
 #include "Client.hpp"
 #include "Database.hpp"
 #include "GlobalConfig.hpp"
+#include "Lobby.hpp"
 #include "common/Networking.hpp"
 #include "common/itf/core.pb.h"
 #include "common/logging/Log.hpp"
@@ -89,10 +90,47 @@ void ClientManager::newClientThreadMain(const common::ConnectionInfo &info) {
       continue;
     }
     client->onSend(resp.value());
+    sendBroadcast(client, req.value(), resp.value());
   }
 
   client->onDisconnect();
   Database::get().removePlayer(id);
+}
+
+void ClientManager::sendBroadcast(Client *client, common::itf::C2SMessage &req,
+                                  common::itf::S2CMessage &resp) {
+  if (not client->lobby) {
+    return;
+  }
+  auto &lobby = Database::get().getLobbyById(*client->lobby);
+  for (auto playerIdx : lobby.getMembersIds()) {
+    auto *player = Database::get().getPlayerById(playerIdx);
+    assert(player != nullptr);
+    if (player == client) {
+      continue;
+    }
+    common::itf::S2CMessage msg;
+    if (resp.update().game().has_ispositionok() and
+        resp.update().game().ispositionok()) {
+      auto &position =
+          *msg.mutable_ind()->mutable_playerinfo()->mutable_position();
+      position.set_x(req.update().game().position().x());
+      position.set_y(req.update().game().position().y());
+    } else if (req.update().lobby().has_action()) {
+      auto &info = *msg.mutable_ind()->mutable_playerinfo();
+      info.set_action(req.update().lobby().action());
+
+      if (req.update().lobby().action() == common::itf::LobbyAction::ENTER) {
+        auto &position = *info.mutable_position();
+        position.set_x(client->getPosition().x);
+        position.set_y(client->getPosition().y);
+      }
+    }
+    if (msg.has_ind()) {
+      msg.mutable_ind()->mutable_playerinfo()->set_id(client->id());
+      player->onSend(msg);
+    }
+  }
 }
 
 } // namespace bm
