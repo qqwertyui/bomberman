@@ -2,6 +2,8 @@
 
 #include "common/ConnectionManager.hpp"
 #include "common/itf/core.pb.h"
+#include "scene/SharedData.hpp"
+#include <SFML/Graphics.hpp>
 #include <array>
 #include <string>
 #include <thread>
@@ -9,7 +11,7 @@
 namespace bm::scene::game {
 class MessageHandler {
 public:
-  MessageHandler(common::ConnectionManager &connMgr);
+  MessageHandler(SharedData &shared);
   ~MessageHandler();
 
   bool isConnected() const;
@@ -41,6 +43,7 @@ private:
   unsigned int activeBufferIndex, passiveBufferIndex;
 
   common::ConnectionManager &connMgr;
+  GameContext &gameContext;
   std::thread serverMessageHandler;
 };
 

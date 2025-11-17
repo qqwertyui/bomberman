@@ -5,17 +5,8 @@
 #include <algorithm>
 
 namespace bm::scene::game {
-Player::Player(sf::RenderTarget &parentWindow) : parentWindow(parentWindow) {
-  constexpr float playerSize{60.f};
-  circle.setRadius(playerSize / 2.f);
-  circle.setFillColor(sf::Color::Red);
-
-  const auto radius{circle.getRadius()};
-  circle.setOrigin(sf::Vector2f{radius, radius});
-
-  position = sf::Vector2f{radius, radius};
-  circle.setPosition(position);
-
+Player::Player(sf::RenderTarget &parentWindow, SharedData &shared)
+    : model(*shared.gameContext.player->model), parentWindow(parentWindow) {
   updateTime.restart();
 }
 
@@ -51,7 +42,7 @@ sf::Vector2f Player::calculateVelocity() const {
 
 sf::Vector2f Player::alignToMapBounds(sf::Vector2f position) const {
   const auto windowSize{parentWindow.getSize()};
-  auto radius{static_cast<unsigned int>(circle.getRadius())};
+  auto radius{static_cast<unsigned int>(model.size())};
   const sf::Vector2u halfModelSize{radius, radius};
 
   sf::Vector2f lowerBound{halfModelSize};
@@ -61,7 +52,7 @@ sf::Vector2f Player::alignToMapBounds(sf::Vector2f position) const {
                       std::clamp(position.y, lowerBound.y, upperBound.y)};
 }
 
-sf::Vector2f Player::calculatePosition(sf::Vector2f currentPosition,
+sf::Vector2f Player::calculatePosition(sf::Vector2f position,
                                        sf::Vector2f velocity) {
   constexpr unsigned int microsecond{1'000'000};
   sf::Vector2f pixelsPerUs{velocity.x / microsecond, velocity.y / microsecond};
@@ -69,32 +60,31 @@ sf::Vector2f Player::calculatePosition(sf::Vector2f currentPosition,
       static_cast<float>(updateTime.getElapsedTime().asMicroseconds())};
   sf::Vector2f distance{usSinceLastUpdate * pixelsPerUs};
 
-  currentPosition += distance;
-  return alignToMapBounds(currentPosition);
+  position += distance;
+  return alignToMapBounds(position);
 }
 
 bool Player::hasMoved(sf::Vector2f posA, sf::Vector2f posB) const {
-  return (static_cast<sf::Vector2i>(posA) != static_cast<sf::Vector2i>(posB));
+  return (posA != posB);
 }
 
 void Player::update(common::itf::C2SMessage &req) {
   auto velocity = calculateVelocity();
-  auto oldPosition = position;
-  position = calculatePosition(position, velocity);
+  auto oldPosition = model.getPosition();
+  auto newPosition = calculatePosition(oldPosition, velocity);
 
-  if (hasMoved(oldPosition, position)) {
-    circle.setPosition(position);
+  if (hasMoved(oldPosition, newPosition)) {
+    model.setPosition(newPosition);
 
     auto *msg = req.mutable_update()->mutable_game()->mutable_position();
-    msg->set_x(position.x);
-    msg->set_y(position.y);
+    msg->set_x(newPosition.x);
+    msg->set_y(newPosition.y);
   }
-
   updateTime.restart();
 }
 
 void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const {
-  target.draw(circle, states);
+  model.draw(target, states);
 }
 
 } // namespace bm::scene::game

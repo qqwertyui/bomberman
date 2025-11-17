@@ -3,7 +3,7 @@ package bm.common.itf;
 
 import "lobby.proto";
 import "game.proto";
-
+import "types.proto";
 
 message UpdateReq {
   optional UpdateLobbyReq lobby = 1;
@@ -15,6 +15,12 @@ message UpdateResp {
   optional UpdateGameResp game = 2;
 }
 
+message PlayerInfo {
+  required int32 id = 1;
+  optional LobbyAction action = 2;
+  optional Position position = 3;
+}
+
 message UpdateInd {
   message GameStateModification {
     enum State {
@@ -22,7 +28,7 @@ message UpdateInd {
       FINISHED = 1;
     }
   }
-
-  optional GameStateModification gameState = 1;
-  optional bool dead = 2;
+  optional PlayerInfo playerInfo = 1;
+  optional GameStateModification gameState = 2;
+  optional bool dead = 3;
 }

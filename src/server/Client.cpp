@@ -92,7 +92,7 @@ void Client::handleLobbyUpdate(const common::itf::UpdateLobbyReq &req,
   }
   auto &targetLobby = Database::get().getLobbyById(targetLobbyId);
 
-  if (req.action() == common::itf::UpdateLobbyReq::ENTER) {
+  if (req.action() == common::itf::LobbyAction::ENTER) {
     if (targetLobby.isFull()) {
       resp.set_status(common::itf::UpdateLobbyResp::LOBBY_FULL);
       return;
@@ -104,7 +104,7 @@ void Client::handleLobbyUpdate(const common::itf::UpdateLobbyReq &req,
     targetLobby.add(playerId);
     currentLobbyId = targetLobbyId;
 
-  } else if (req.action() == common::itf::UpdateLobbyReq::EXIT) {
+  } else if (req.action() == common::itf::LobbyAction::EXIT) {
     if (not currentLobbyId.has_value()) {
       LOG_ERR("Player %d tries to leave lobby %d but doesn't belong to one",
               playerId, targetLobbyId);
@@ -120,10 +120,37 @@ void Client::handleLobbyUpdate(const common::itf::UpdateLobbyReq &req,
     auto &currentLobby{Database::get().getLobbyById(currentLobbyId.value())};
     currentLobby.remove(playerId);
     currentLobbyId = std::nullopt;
+    return;
   } else {
     LOG_ERR("Player %d sent invalid lobby request (%d)", playerId,
             common::toUnderlying(req.action()));
     resp.set_status(common::itf::UpdateLobbyResp::INVALID_REQUEST);
+  }
+
+  if (resp.status() != common::itf::UpdateLobbyResp::OK) {
+    return;
+  }
+  this->position = sf::Vector2f{100.f, 100.f};
+
+  auto &currentLobby{Database::get().getLobbyById(currentLobbyId.value())};
+  for (const auto &id : currentLobby.getMembersIds()) {
+    if (id == this->id()) {
+      auto &player = *resp.mutable_player();
+      player.set_id(id);
+      auto &position = *player.mutable_position();
+      position.set_x(this->getPosition().x);
+      position.set_y(this->getPosition().y);
+      continue;
+    }
+    auto *member{Database::get().getPlayerById(id)};
+    if (not member) {
+      continue;
+    }
+    auto *player = resp.add_enemies();
+    player->set_id(id);
+    auto *position = player->mutable_position();
+    position->set_x(member->getPosition().x);
+    position->set_y(member->getPosition().y);
   }
 }
 
@@ -135,9 +162,10 @@ void Client::handleGameUpdate(const common::itf::UpdateGameReq &req,
     return;
   }
   if (req.has_position()) {
-    [[maybe_unused]] const int x{req.position().x()};
-    [[maybe_unused]] const int y{req.position().y()};
-    resp.set_ispositionok(true);
+    const auto newPosition{
+        sf::Vector2f(req.position().x(), req.position().y())};
+    resp.set_ispositionok(this->position != newPosition);
+    this->position = newPosition;
   }
 }
 
@@ -155,5 +183,9 @@ void Client::onDisconnect() {
   connMgr.disconnect();
   LOG_INF("[-] Disconnected from %s:%u", info->ip.c_str(), info->port);
 }
+
+int Client::id() const { return playerId; }
+
+sf::Vector2f Client::getPosition() const { return position; }
 
 } // namespace bm

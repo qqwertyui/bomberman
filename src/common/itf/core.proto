@@ -10,12 +10,14 @@ import "update.proto";
   S2C -> server to client
 */
 message C2SMessage {
-  optional QueryReq query = 1;
-  optional UpdateReq update = 2;
+  required int32 sn = 1;
+  optional QueryReq query = 2;
+  optional UpdateReq update = 3;
 }
 
 message S2CMessage {
-  optional QueryResp query = 1;
-  optional UpdateResp update = 2;
-  optional UpdateInd ind = 3;
+  required int32 sn = 1;
+  optional QueryResp query = 2;
+  optional UpdateResp update = 3;
+  optional UpdateInd ind = 4;
 }
